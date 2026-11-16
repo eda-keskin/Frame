@@ -423,27 +423,27 @@
 }
 
 .task-priority {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
 
 .task-priority.priority-high {
-  background: var(--error-subtle);
-  color: var(--error);
+  background: var(--badge-error-bg);
+  color: var(--badge-error-fg);
 }
 
 .task-priority.priority-medium {
-  background: rgba(229, 205, 142, 0.15);
-  color: var(--warning);
+  background: var(--badge-warning-bg);
+  color: var(--badge-warning-fg);
 }
 
 .task-priority.priority-low {
-  background: var(--success-subtle);
-  color: var(--success);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-fg);
 }
 
 .task-category {
@@ -935,29 +935,29 @@
 }
 
 .plugin-status {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
 
 .plugin-status.status-enabled {
-  background: var(--success-subtle);
-  color: var(--success);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-fg);
 }
 
 .plugin-status.status-installed {
-  background: rgba(166, 192, 240, 0.15);
-  color: var(--info);
+  background: var(--badge-info-bg);
+  color: var(--badge-info-fg);
 }
 
 /* Was --text-muted on --bg-hover: 1.44:1 in light theme, unreadable
    (status-bar spec's light pass). --text-secondary clears AA on both. */
 .plugin-status.status-available {
-  background: var(--bg-hover);
-  color: var(--text-secondary);
+  background: var(--badge-neutral-bg);
+  color: var(--badge-neutral-fg);
 }
 
 .plugin-description {

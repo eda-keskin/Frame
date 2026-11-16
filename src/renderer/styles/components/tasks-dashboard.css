@@ -530,26 +530,28 @@
 
 /* The badge row's "SPEC" chip, in the priority badge's frame. */
 .tasks-tile-spec-chip {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 4px 8px;
-  border-radius: 3px;
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  background: var(--badge-accent-bg);
+  color: var(--badge-accent-fg);
 }
 
 .tasks-tile-priority {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 4px 8px;
-  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
 
-.tasks-tile-priority.priority-high { background: var(--error-subtle); color: var(--error); }
-.tasks-tile-priority.priority-medium { background: rgba(229, 205, 142, 0.15); color: var(--warning); }
-.tasks-tile-priority.priority-low { background: var(--success-subtle); color: var(--success); }
+.tasks-tile-priority.priority-high { background: var(--badge-error-bg); color: var(--badge-error-fg); }
+.tasks-tile-priority.priority-medium { background: var(--badge-warning-bg); color: var(--badge-warning-fg); }
+.tasks-tile-priority.priority-low { background: var(--badge-success-bg); color: var(--badge-success-fg); }
 
 .tasks-tile-category {
   font-size: 10px;
@@ -830,32 +832,29 @@
 }
 
 .tasks-dashboard-detail-status-pill {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-subtle);
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  background: var(--badge-neutral-bg);
+  color: var(--badge-neutral-fg);
 }
 
 .tasks-dashboard-detail-status-pill.status-pending {
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
+  background: var(--badge-neutral-bg);
+  color: var(--badge-neutral-fg);
 }
 
 .tasks-dashboard-detail-status-pill.status-in-progress {
-  background: rgba(166, 192, 240, 0.15);
-  color: var(--info);
-  border-color: rgba(166, 192, 240, 0.3);
+  background: var(--badge-info-bg);
+  color: var(--badge-info-fg);
 }
 
 .tasks-dashboard-detail-status-pill.status-completed {
-  background: var(--success-subtle);
-  color: var(--success);
-  border-color: rgba(155, 220, 168, 0.3);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-fg);
 }
 
 .tasks-dashboard-detail-title {

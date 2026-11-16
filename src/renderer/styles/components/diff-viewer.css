@@ -82,22 +82,22 @@
 
 .diff-section-pill {
   flex: 0 0 auto;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  padding: 4px 8px;
-  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
 
 .diff-section-pill[data-pill="working"] {
-  color: var(--warning, #e5a50a);
-  background: color-mix(in srgb, var(--warning, #e5a50a) 16%, transparent);
+  background: var(--badge-warning-bg);
+  color: var(--badge-warning-fg);
 }
 
 .diff-section-pill[data-pill="staged"] {
-  color: var(--success, #9bdca8);
-  background: color-mix(in srgb, var(--success, #9bdca8) 16%, transparent);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-fg);
 }
 
 .diff-section-pos {
@@ -212,22 +212,22 @@
 
 #diff-viewer-pill {
   flex: 0 0 auto;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
 
 #diff-viewer-pill[data-pill="working"] {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
+  background: var(--badge-warning-bg);
+  color: var(--badge-warning-fg);
 }
 
 #diff-viewer-pill[data-pill="staged"] {
-  background: var(--success-subtle);
-  color: var(--success);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-fg);
 }
 
 #diff-viewer-actions {
