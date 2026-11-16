@@ -13,10 +13,9 @@
  * Other statuses (working / running / idle) are intentionally not surfaced —
  * the list only flags projects that need the user's attention.
  *
- * The tally itself is `computeCounts()`, exported because three surfaces want
- * the same numbers: the project list's badges, the sidebar's ◆ chip (this
- * project) and the status bar's left slot (the other projects). One
- * implementation, no new IPC (D8).
+ * The tally itself is `computeCounts()`, exported because two surfaces want
+ * the same numbers: the project list's badges and the status bar's left slot
+ * (the other projects). One implementation, no new IPC (D8).
  */
 
 const { ipcRenderer } = require('electron');

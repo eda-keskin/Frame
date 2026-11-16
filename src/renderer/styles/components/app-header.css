@@ -101,7 +101,7 @@
 
 .sidebar-current-project:hover {
   background: var(--bg-elevated);
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 .sidebar-current-project[aria-expanded="true"] {
@@ -271,7 +271,7 @@
 }
 
 .app-header-right select:hover {
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
   background: var(--bg-elevated);
 }
 
@@ -426,11 +426,12 @@
 
 .ai-tool-picker:hover {
   background: var(--bg-elevated);
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 .ai-tool-picker:focus-within {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .ai-tool-picker-label {

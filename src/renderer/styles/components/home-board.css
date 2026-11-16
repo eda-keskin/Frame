@@ -87,11 +87,12 @@
 }
 
 .home-card:hover {
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 .home-card.active {
-  border-color: color-mix(in srgb, var(--accent-primary) 45%, transparent);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .home-card-header {
@@ -103,9 +104,12 @@
   background: none;
   border: none;
   border-bottom: 1px solid var(--border-subtle);
-  /* 16px all round, the inset every text on Home starts from (the
-     composer's prompt and controls, the card body below). */
-  padding: 16px;
+  /* 16px from the left, the inset every text on Home starts from (the
+     composer's prompt and controls, the card body below). 8px on the top,
+     right and bottom: the 32px open button makes up the rest, so the header
+     stays 48px, and the button sits 8px from both the top and the right
+     edge — its 16px icon 16px from each, the title's inset. */
+  padding: 8px 8px 8px 16px;
   color: var(--text-primary);
   font: inherit;
   cursor: pointer;
@@ -122,6 +126,16 @@
   font-weight: 700;
 }
 
+/* Invisible 24×24 frame around the count badge: only sets its footprint. */
+.home-card-count-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: 24px;
+  height: 24px;
+}
+
 /* Neutral, not the accent: a quiet grey chip with an outline, so the
    count reads as data rather than as a call to action. */
 .home-card-count {
@@ -129,21 +143,50 @@
   color: var(--text-secondary);
   background: var(--bg-tertiary);
   box-shadow: inset 0 0 0 1px var(--border-strong);
-  /* Square-cornered, 16px: a one-digit count is a 16×16 tile (12px line +
-     2px 4px padding), longer counts widen it. */
+  /* Square-cornered, 24px: a one-digit count is a 24×24 tile, longer
+     counts widen it. */
   border-radius: 4px;
   box-sizing: border-box;
-  min-width: 16px;
-  padding: 2px 4px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
   font-weight: 700;
-  line-height: 12px;
+  line-height: 24px;
   text-align: center;
 }
 
+/* The rail button's shape (.sidebar-rail-btn): a 32px target with a 4px
+   inset around a 16px icon that keeps a true 2px stroke. No background at rest; on hover it
+   lights up like a rail button. */
 .home-card-open {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  box-sizing: border-box;
   margin-left: auto;
+  border-radius: var(--radius-md);
   color: var(--accent-primary);
+  transition: background var(--transition-fast);
+}
+
+.home-card-open svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+/* Lucide draws on a 24-unit grid, so at 16px a stroke-width of 2 would
+   shrink to 1.33px. Non-scaling keeps it at 2 screen pixels. */
+.home-card-open svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.home-card-open:hover {
+  background: var(--bg-hover);
 }
 
 /* The body takes the slack and scrolls inside the card, so a card with 50
@@ -312,24 +355,24 @@
    "medium"s are not. */
 .home-card-cat {
   flex-shrink: 0;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  background: var(--bg-elevated);
-  border-radius: 99px;
-  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  color: var(--badge-neutral-fg);
+  background: var(--badge-neutral-bg);
 }
 
 .home-card-cat.cat-fix {
-  color: var(--error, #d45555);
-  background: color-mix(in srgb, var(--error, #d45555) 14%, transparent);
+  color: var(--badge-error-fg);
+  background: var(--badge-error-bg);
 }
 
 .home-card-cat.cat-feature {
-  color: var(--accent-primary);
-  background: var(--accent-subtle);
+  color: var(--badge-accent-fg);
+  background: var(--badge-accent-bg);
 }
 
 .home-card-run {
@@ -354,7 +397,7 @@
 
 .home-card-run:hover {
   color: var(--accent-primary);
-  border-color: color-mix(in srgb, var(--accent-primary) 45%, transparent);
+  border-color: var(--accent-primary);
 }
 
 /* Work this card does not list, and the one thing most likely to be
@@ -483,7 +526,7 @@
 
 .lane-status-dot.agent-working {
   background: var(--accent-primary);
-  animation: lane-pulse 1.2s ease-in-out infinite;
+  animation: lane-shift 2.4s ease-in-out infinite;
 }
 
 .lane-status-dot.agent-approval {
@@ -497,7 +540,7 @@
 
 .lane-status-dot.running {
   background: var(--success, #23d18b);
-  animation: lane-pulse 1.2s ease-in-out infinite;
+  animation: lane-shift 2.4s ease-in-out infinite;
 }
 
 .lane-status-dot.idle {
@@ -508,6 +551,14 @@
 @keyframes lane-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.35; }
+}
+
+/* Live (green) dots don't blink: they stay fully lit and drift through
+   neighbouring greens, so "alive" reads as motion, not as an on/off flash. */
+@keyframes lane-shift {
+  0%, 100% { filter: none; }
+  33%      { filter: hue-rotate(-24deg) saturate(1.3); }
+  66%      { filter: hue-rotate(24deg) brightness(1.15); }
 }
 
 /* ─── Empty state ───────────────────────────────────────── */
@@ -897,7 +948,7 @@
 
 .tcn-cancel:hover {
   color: var(--text-primary);
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 /* Closing kills the terminal's process, so it wears the error color. */
@@ -1444,14 +1495,13 @@
 }
 
 .home-composer-box:hover {
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 .home-composer-box:focus-within {
-  border-color: color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  border-color: var(--accent-primary);
   box-shadow:
-    0 0 0 3px var(--accent-subtle),
-    0 6px 24px color-mix(in srgb, #000 12%, transparent);
+    0 0 0 1px var(--accent-primary), 0 6px 24px color-mix(in srgb, #000 12%, transparent);
 }
 
 .home-composer-input {
@@ -1575,16 +1625,16 @@
 
 [data-scheme="light"] .home-composer-box:hover,
 [data-scheme="light"] .home-card:hover {
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 [data-scheme="light"] .home-composer-box:focus-within {
-  border-color: color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  border-color: var(--accent-primary);
   box-shadow:
-    0 0 0 3px var(--accent-subtle),
-    0 8px 32px rgba(0, 0, 0, 0.02);
+    0 0 0 1px var(--accent-primary), 0 8px 32px rgba(0, 0, 0, 0.02);
 }
 
 [data-scheme="light"] .home-card.active {
-  border-color: color-mix(in srgb, var(--accent-primary) 45%, transparent);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }

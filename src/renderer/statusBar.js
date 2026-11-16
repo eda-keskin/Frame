@@ -17,7 +17,7 @@
  * monochrome icon per dock tab, click toggles that tab, the open tab's icon
  * reads as active) and then the agents running in **the other projects**,
  * and only them (D14), which keeps its place. This project's
- * agents are already on screen in Overview and in the sidebar's ◆ chip;
+ * agents are already on screen in Overview and in the terminal tabs;
  * repeating them here would earn the obvious "I have 5 agents, why does it
  * say 2?". The label says its scope out loud for the same reason.
  *

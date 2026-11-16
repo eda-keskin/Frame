@@ -232,6 +232,7 @@ body.dock-resizing-ew * {
 .dock-view-search:focus {
   outline: none;
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .dock-view-count {
@@ -257,7 +258,7 @@ body.dock-resizing-ew * {
 }
 
 .dock-view-btn:hover {
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
   background: var(--bg-elevated);
   color: var(--text-primary);
 }

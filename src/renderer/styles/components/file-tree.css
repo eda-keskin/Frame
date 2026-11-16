@@ -32,6 +32,7 @@
 
 .file-tree-search input:focus {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
   background: var(--bg-elevated);
 }
 

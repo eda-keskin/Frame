@@ -1,7 +1,7 @@
 {
   "version": "1.1",
   "description": "Auto-generated module structure",
-  "lastUpdated": "2026-10-21",
+  "lastUpdated": "2026-11-16",
   "architecture": {},
   "modules": {
     ".claude/settings.json": {
@@ -10,7 +10,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 1202,
+      "sizeBytes": 1514,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -10758,7 +10758,7 @@
           "purpose": "Never truncate a list silently — say how much is not shown."
         }
       },
-      "sizeBytes": 4450,
+      "sizeBytes": 4493,
       "extraction": {
         "status": "parsed"
       },
@@ -12205,8 +12205,7 @@
         "terminal",
         "laneStatus",
         "orchestrator",
-        "commandRegistry",
-        "projectStatusBadges"
+        "commandRegistry"
       ],
       "functions": {
         "init": {
@@ -12344,20 +12343,20 @@
           "line": 354
         },
         "revealNavItem": {
-          "line": 423,
+          "line": 422,
           "params": [
             "view"
           ],
           "purpose": "Make a nav row reachable without changing the user's saved layout: expand"
         },
         "placeWorkspaceNav": {
-          "line": 436
+          "line": 435
         },
         "refreshWorkspaceNav": {
-          "line": 448
+          "line": 447
         },
         "updateWorkspaceNav": {
-          "line": 524,
+          "line": 495,
           "purpose": "Called by multiTerminalUI on every manager state change so the Terminals"
         }
       },
@@ -12375,7 +12374,7 @@
           "REMOVE_PROJECT_FROM_WORKSPACE"
         ]
       },
-      "sizeBytes": 20596,
+      "sizeBytes": 18821,
       "extraction": {
         "status": "parsed"
       },
@@ -12657,23 +12656,23 @@
       ],
       "functions": {
         "init": {
-          "line": 33,
+          "line": 32,
           "params": [
             "multiTerminalUI"
           ]
         },
         "schedule": {
-          "line": 44
+          "line": 43
         },
         "computeCounts": {
-          "line": 60,
+          "line": 59,
           "params": [
             "states"
           ],
           "purpose": "Tally attention-worthy agent statuses per project."
         },
         "recompute": {
-          "line": 81,
+          "line": 80,
           "purpose": "Recompute the tally and hand it to both surfaces that draw it. One pass,"
         }
       },
@@ -12683,7 +12682,7 @@
         ],
         "emits": []
       },
-      "sizeBytes": 3173,
+      "sizeBytes": 3129,
       "extraction": {
         "status": "parsed"
       },
@@ -14451,7 +14450,7 @@
           "LOAD_CLAUDE_USAGE"
         ]
       },
-      "sizeBytes": 22044,
+      "sizeBytes": 22039,
       "extraction": {
         "status": "parsed"
       },
@@ -15071,7 +15070,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 13599,
+      "sizeBytes": 13648,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15095,7 +15094,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 3230,
+      "sizeBytes": 3277,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15143,7 +15142,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 8845,
+      "sizeBytes": 8893,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15155,7 +15154,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 6524,
+      "sizeBytes": 6643,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15167,7 +15166,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 5263,
+      "sizeBytes": 5310,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15203,7 +15202,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 34666,
+      "sizeBytes": 34667,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15215,7 +15214,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 37599,
+      "sizeBytes": 39003,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15239,7 +15238,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 3870,
+      "sizeBytes": 3918,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15263,7 +15262,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 104389,
+      "sizeBytes": 104499,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15287,7 +15286,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 3957,
+      "sizeBytes": 4005,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15323,7 +15322,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 8983,
+      "sizeBytes": 8984,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15347,7 +15346,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 18503,
+      "sizeBytes": 18582,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15371,7 +15370,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 36511,
+      "sizeBytes": 36531,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15383,7 +15382,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 4065,
+      "sizeBytes": 4012,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15395,7 +15394,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 16038,
+      "sizeBytes": 17345,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15431,7 +15430,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 20778,
+      "sizeBytes": 20826,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15455,7 +15454,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 12443,
+      "sizeBytes": 11775,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15479,7 +15478,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 9715,
+      "sizeBytes": 10903,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -28522,6 +28521,6 @@
       "truncated": false,
       "samples": []
     },
-    "revision": "e28aa60c6d1aadcb35099ef01ea634ff7a26a2e1a4b3fdf3921cc7daa57cdd37"
+    "revision": "750b304bc7042c9d518796fadaec17dcaf99e21165f6d2e057906d4ba1ed18ae"
   }
 }

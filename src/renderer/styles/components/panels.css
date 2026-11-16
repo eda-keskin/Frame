@@ -91,7 +91,7 @@
 }
 
 .history-item:hover {
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
   background: var(--bg-elevated);
 }
 
@@ -225,7 +225,7 @@
   background: var(--accent-secondary);
   border-color: var(--accent-secondary);
   transform: translateY(-1px);
-  box-shadow: 0 0 18px var(--accent-glow), var(--shadow-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Quick Add button (inside the filter row, right-aligned) */
@@ -344,7 +344,7 @@
 }
 
 .task-item:hover {
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
   background: var(--bg-elevated);
 }
 
@@ -880,7 +880,7 @@
 }
 
 .plugin-item:hover {
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
   background: var(--bg-elevated);
 }
 
@@ -1167,7 +1167,7 @@
 }
 
 .session-item:hover {
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
   background: var(--bg-elevated);
 }
 
@@ -1431,7 +1431,7 @@
 /* Hiding the radio hides its focus ring with it, so the card wears one. */
 .modal-body .init-sharing-option:has(input:focus-visible) {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-subtle);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .modal-body .init-sharing-option input[type="radio"] {
@@ -1567,8 +1567,8 @@
 }
 
 .modal-body input:focus {
-  border-color: var(--success);
-  box-shadow: 0 0 0 2px rgba(155, 220, 168, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .modal-body input::placeholder {
@@ -1603,8 +1603,8 @@
 }
 
 .modal-body select:focus {
-  border-color: var(--success);
-  box-shadow: 0 0 0 2px rgba(155, 220, 168, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .modal-body select option {
@@ -1690,7 +1690,7 @@
 
 .modal-btn-cancel:hover {
   background: var(--bg-hover);
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 /* Same accent fill as .primary-btn — one primary across the app. */
@@ -1774,7 +1774,7 @@
   outline: none;
   border-color: var(--accent-primary);
   background: var(--bg-elevated);
-  box-shadow: 0 0 0 1px var(--accent-subtle);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .map-search-icon {
@@ -1984,7 +1984,7 @@
 
 .relationship-item:hover {
   background: var(--bg-hover);
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
 }
 
 .relationship-icon {
@@ -2174,7 +2174,7 @@
 
 .btn-structure-map-toggle:hover {
   background: rgba(160, 155, 148, 0.15) !important;
-  border-color: var(--text-secondary) !important;
+  border-color: var(--accent-primary) !important;
   color: var(--text-secondary) !important;
 }
 
@@ -2559,7 +2559,7 @@
 .btn-load-git:hover:not(:disabled) {
   background: var(--bg-hover);
   color: var(--text-primary);
-  border-color: var(--text-muted);
+  border-color: var(--accent-primary);
 }
 
 .btn-load-git:disabled {
@@ -2968,7 +2968,7 @@
 }
 
 .prompt-card:hover {
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
   background: var(--bg-elevated);
 }
 
@@ -3328,45 +3328,44 @@
 
 /* Phase badges — color-coded by lifecycle phase */
 .spec-phase-badge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  padding: 2px 8px;
+  border-radius: 10px;
   white-space: nowrap;
 }
 
 .spec-phase-badge.phase-draft {
-  background: var(--bg-hover);
-  color: var(--text-tertiary);
+  background: var(--badge-neutral-bg);
+  color: var(--badge-neutral-fg);
 }
 
 .spec-phase-badge.phase-specified,
 .spec-phase-badge.phase-planned {
-  background: rgba(166, 192, 240, 0.15);
-  color: var(--info);
+  background: var(--badge-info-bg);
+  color: var(--badge-info-fg);
 }
 
 .spec-phase-badge.phase-tasks_generated {
-  background: rgba(229, 205, 142, 0.15);
-  color: var(--warning);
+  background: var(--badge-warning-bg);
+  color: var(--badge-warning-fg);
 }
 
 .spec-phase-badge.phase-implementing {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
+  background: var(--badge-accent-bg);
+  color: var(--badge-accent-fg);
 }
 
 .spec-phase-badge.phase-done {
-  background: rgba(155, 220, 168, 0.15);
-  color: var(--success);
+  background: var(--badge-success-bg);
+  color: var(--badge-success-fg);
 }
 
 /* A spec folder Frame could not read as a spec (issue #122). Warning
    colours, not error: the folder is fine, its status.json needs a field. */
 .spec-phase-badge.phase-malformed {
-  background: rgba(229, 205, 142, 0.15);
+  background: var(--badge-warning-bg);
   color: var(--warning-ink);
 }
 
@@ -3639,7 +3638,7 @@
   border-color: var(--accent-secondary);
   color: var(--bg-deep);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md), var(--shadow-glow);
+  box-shadow: var(--shadow-md);
 }
 
 .spec-plan-report-btn:active {
@@ -3768,7 +3767,7 @@
 
 .spec-task-row:hover {
   background: var(--bg-elevated);
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
 }
 
 .spec-task-row.status-completed {
@@ -4037,6 +4036,7 @@
 
 .spec-modal-input:focus {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .spec-modal-field-label {
@@ -4074,6 +4074,7 @@
 
 .spec-modal-textarea:focus {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .spec-modal-textarea::placeholder {
@@ -4152,11 +4153,12 @@
 }
 
 .impl-mode-option:hover {
-  border-color: var(--border-strong, var(--accent-primary));
+  border-color: var(--accent-primary);
 }
 
 .impl-mode-option.selected {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
   background: var(--accent-subtle, rgba(143, 240, 174, 0.12));
 }
 
@@ -4206,11 +4208,12 @@
 }
 
 .impl-dest-option:hover:not(.disabled) {
-  border-color: var(--border-strong, var(--accent-primary));
+  border-color: var(--accent-primary);
 }
 
 .impl-dest-option.selected {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
   background: var(--accent-subtle, rgba(143, 240, 174, 0.12));
 }
 
@@ -4420,7 +4423,7 @@
   outline: none;
   border-color: var(--accent-primary);
   background: var(--bg-elevated);
-  box-shadow: 0 0 0 1px var(--accent-subtle);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .specs-dashboard-search:focus-within .specs-dashboard-search-icon {
@@ -4575,7 +4578,7 @@
 
 .specs-filter-chip:hover {
   color: var(--text-secondary);
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
   background: var(--bg-tertiary);
 }
 

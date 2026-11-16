@@ -284,7 +284,7 @@
 .sb-dock {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -297,7 +297,7 @@
   padding: 0;
   background: none;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   color: var(--text-secondary);
   cursor: pointer;
   transition: color var(--transition-fast), background var(--transition-fast);
@@ -308,9 +308,11 @@
   background: var(--bg-hover);
 }
 
+/* The left rail's selected state (.sidebar-rail-btn.active), not the
+   accent. */
 .sb-dock-btn.on {
-  color: var(--accent-primary);
-  background: var(--accent-subtle);
+  color: var(--selected-fg);
+  background: var(--selected-bg);
 }
 
 .sb-dock-btn:focus-visible {

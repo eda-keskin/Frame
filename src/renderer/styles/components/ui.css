@@ -139,7 +139,7 @@ svg[stroke="currentColor"]:not(.sidebar-rail-btn svg, [width="20"], [width="22"]
 
 .btn:hover {
   background: var(--bg-hover);
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
@@ -722,6 +722,7 @@ select:focus-visible {
 .task-form-group select:focus {
   outline: none;
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
   background: var(--bg-elevated);
 }
 

@@ -73,6 +73,7 @@
 
 .cheat-sheet-search:focus {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .cheat-sheet-search::placeholder {

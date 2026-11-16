@@ -368,7 +368,6 @@ function buildWorkspaceNav() {
             <span class="workspace-nav-label">${item.label}</span>
             ${item.beta ? '<span class="workspace-nav-beta" title="Orchestration is in beta">Beta</span>' : ''}
             <span class="workspace-nav-right">
-              ${item.view === 'terminals' ? '<span class="workspace-nav-agents" style="display:none"></span>' : ''}
               ${item.view === 'orchestrator' ? '<span class="workspace-nav-running" style="display:none" title="A conductor session is running">running</span>' : ''}
               ${item.view === 'terminals' || item.count ? `<span class="workspace-nav-count" data-count="${item.view}"></span>` : ''}
             </span>
@@ -448,22 +447,12 @@ function placeWorkspaceNav() {
 function refreshWorkspaceNav() {
   if (!workspaceNavEl || !workspaceNavEl.isConnected) return;
   let count = 0;
-  let agents = 0;
-  let waiting = { approval: 0, input: 0 };
   let surface = '';
   try {
     const ui = require('./terminal').getMultiTerminalUI();
     const manager = ui && ui.getManager && ui.getManager();
     if (manager) {
-      const laneStatus = require('./laneStatus');
-      const terminals = manager.getTerminalsByProject(activeProjectPath);
-      count = terminals.length;
-      agents = terminals.filter(t => laneStatus.getStatus(t.id).agentName).length;
-      // Same tally the project badges and the status bar slot use (D8) —
-      // computed here rather than read from agentStatusMap so the chip is
-      // never a frame behind its own laneStatus.onChange.
-      waiting = require('./projectStatusBadges').computeCounts(terminals)
-        .get(activeProjectPath) || waiting;
+      count = manager.getTerminalsByProject(activeProjectPath).length;
       surface = ui.getActiveSurface ? ui.getActiveSurface() : manager.viewMode;
     }
   } catch (_) { /* terminal UI not initialized yet */ }
@@ -485,24 +474,6 @@ function refreshWorkspaceNav() {
     el.querySelector('.workspace-nav-group-header')
       .classList.toggle('on', holdsActive && el.classList.contains('collapsed'));
   });
-  // The ◆ chip counts this project's running agents and, from here on, says
-  // when one of them is waiting — the gap it closes is an agent blocked on
-  // approval while you are off on Specs, Tasks, Decisions or a panel. Colour
-  // and symbol come from the shared vocabulary, so the sidebar and the status
-  // bar say the same thing at two different scopes (§5c, §7).
-  const laneStatus = require('./laneStatus');
-  const attention = waiting.approval ? 'agent-approval' : waiting.input ? 'agent-input' : null;
-  const mark = attention ? laneStatus.attentionMark(attention) : '';
-  const agentsEl = termItem.querySelector('.workspace-nav-agents');
-  agentsEl.style.display = agents > 0 ? '' : 'none';
-  agentsEl.className = `workspace-nav-agents${attention ? ` ${attention}` : ''}`;
-  agentsEl.textContent = `◆ ${agents}${mark ? ` ${mark}` : ''}`;
-  agentsEl.title = [
-    `${agents} agent${agents === 1 ? '' : 's'} running`,
-    waiting.approval ? `${waiting.approval} needs approval` : null,
-    waiting.input ? `${waiting.input} awaiting input` : null
-  ].filter(Boolean).join(' · ');
-
   const orchEl = workspaceNavEl.querySelector('.workspace-nav-running');
   if (orchEl) {
     let orchActive = false;

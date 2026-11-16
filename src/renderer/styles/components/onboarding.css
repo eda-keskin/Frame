@@ -70,6 +70,7 @@
 
 .onboarding-tool-option.selected {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
   background: var(--accent-subtle);
   color: var(--text-primary);
 }
@@ -103,7 +104,7 @@
 
 .onboarding-skip:hover {
   background: var(--bg-hover);
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
   color: var(--text-primary);
 }
 

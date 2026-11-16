@@ -53,17 +53,19 @@
 }
 
 .feedback-kind:hover {
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
   color: var(--text-primary);
 }
 
 .feedback-kind:focus-visible {
   outline: none;
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .feedback-kind.active {
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
   background: var(--accent-glow);
   color: var(--text-primary);
 }
@@ -162,7 +164,8 @@
 .feedback-input:focus,
 .feedback-textarea:focus {
   outline: none;
-  border-color: var(--accent-primary, var(--text-secondary));
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .feedback-textarea {

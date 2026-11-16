@@ -159,7 +159,7 @@
   opacity: 1;
   background: var(--bg-hover);
   color: var(--text-primary);
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 /* Inside a pane, clear of its resize handle */
@@ -179,9 +179,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  border: 2px dashed var(--accent-primary);
-  box-shadow: 0 0 18px var(--accent-glow);
-  background: var(--accent-subtle);
+  border: 1px solid var(--accent-primary);
+  border-radius: inherit;
   z-index: 10;
 }
 

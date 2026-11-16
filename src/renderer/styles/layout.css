@@ -41,7 +41,7 @@
 
 /* Collapsed to the rail (sidebarResize.hide): the panel goes, the icon rail
    stays, VS Code activity-bar style. The inline width is cleared by the
-   module, so the sidebar shrinks to the rail's card. The resize handle stays (without its grip dots) so dragging it out reopens
+   module, so the sidebar shrinks to the rail's card. The resize handle stays so dragging it out reopens
    the panel. */
 #sidebar.collapsed {
   width: auto;
@@ -52,15 +52,10 @@
   display: none;
 }
 
-#sidebar.collapsed #sidebar-resize-handle::before {
-  display: none;
-}
-
 /* Sidebar resize handle: fills the 4px gutter between the sidebar and the
-   center card (right: -4px = the gutter). A
-   vertical three-dot grip at mid-height says "drag me" at rest; while
-   hovered or dragging, a 2px accent line with rounded ends and a 2px inset
-   top and bottom replaces it. */
+   center card (right: -4px = the gutter). Invisible at rest (the
+   col-resize cursor is the cue); while hovered or dragging, a 2px accent
+   line with rounded ends and a 2px inset top and bottom shows. */
 #sidebar-resize-handle {
   position: absolute;
   top: 0;
@@ -70,23 +65,6 @@
   cursor: col-resize;
   z-index: 100;
   background: transparent;
-}
-
-/* The grip: three 2px dots, 3px apart, centered. */
-#sidebar-resize-handle::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 2px;
-  height: 14px;
-  background-image: radial-gradient(circle, var(--text-tertiary) 1px, transparent 1.2px);
-  background-size: 2px 5px;
-  background-repeat: repeat-y;
-  background-position: 0 0;
-  opacity: 0.8;
-  transition: opacity var(--transition-fast);
 }
 
 /* The drag line. */
@@ -102,11 +80,6 @@
   background: var(--accent-primary);
   opacity: 0;
   transition: opacity var(--transition-fast);
-}
-
-#sidebar-resize-handle:hover::before,
-#sidebar-resize-handle.dragging::before {
-  opacity: 0;
 }
 
 #sidebar-resize-handle:hover::after,
@@ -382,7 +355,7 @@ body.sidebar-resizing * {
 }
 
 #project-info:hover {
-  border-color: var(--border-default);
+  border-color: var(--accent-primary);
   background: var(--bg-elevated);
 }
 

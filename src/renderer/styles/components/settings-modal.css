@@ -372,7 +372,7 @@
 
 .settings-about-btn:hover {
   background: var(--bg-hover);
-  border-color: var(--border-strong);
+  border-color: var(--accent-primary);
 }
 
 .settings-about-btn:disabled {

@@ -6,22 +6,24 @@
    inherits the rest — the green accent and the semantic colours included. */
 :root,
 [data-scheme="dark"] {
-  /* Color Palette - neutral charcoal with a green accent, after WhatsApp
-     desktop's dark theme (no warm tint). */
-  --bg-deep: #161717;
-  --bg-primary: #1e1e1e;
-  --bg-secondary: #232626;
-  --bg-tertiary: #2a2d2d;
-  --bg-elevated: #2e3131;
-  --bg-hover: #353535;
+  /* Color Palette - near-black, faintly cool neutrals with a green accent,
+     sampled from VS Code's dark chrome (2026-11-16): the ground and the
+     side bar share #191a1b, the main card (terminal) sinks to #121314,
+     widgets #252627, every hairline #2a2b2c. */
+  --bg-deep: #191a1b;
+  --bg-primary: #121314;
+  --bg-secondary: #191a1b;
+  --bg-tertiary: #252627;
+  --bg-elevated: #2d2e2f;
+  --bg-hover: #2a2b2c;
 
   /* Text Colors */
   /* Every text token clears WCAG AA (4.5:1) on every surface up to
      --bg-hover. */
-  --text-primary: #fafafa;
+  --text-primary: #e4e4e4;
   --text-secondary: #c4c6c6;
   --text-tertiary: #b0b1b1;
-  --text-muted: #a2a0a0;
+  --text-muted: #a6a6a6;
 
   /* Frame's mark — the four corner brackets, wherever they appear (app
      header, boot splash). Deliberately not the accent: the mark is the
@@ -37,14 +39,14 @@
   --accent-glow: rgba(143, 240, 174, 0.08);
 
   /* Selected buttons, tabs and rows: a neutral fill with primary text, no
-     green tint — a light grey that stands clear of --bg-hover (#353535).
+     green tint — a grey that stands clear of --bg-hover (#2a2b2c).
      Light keeps the accent tint (its own block below). */
-  --selected-bg: #4b4e4e;
+  --selected-bg: #393a3b;
   --selected-fg: var(--text-primary);
   --selected-border: var(--selected-bg);
 
   /* Dropdown menus (components/menu.css): macOS-style translucent panel. */
-  --menu-bg: rgba(42, 44, 44, 0.82);
+  --menu-bg: rgba(37, 38, 39, 0.86);
   --menu-border: rgba(255, 255, 255, 0.14);
   --menu-outline: rgba(0, 0, 0, 0.6);
   --menu-hover: rgba(255, 255, 255, 0.10);
@@ -53,13 +55,28 @@
   /* Semantic Colors */
   --success: #9bdca8;
   --success-subtle: rgba(155, 220, 168, 0.15);
-  --warning: #e5cd8e;
+  --warning: #ede884;
   /* Warning text sitting on a warning tint. Dark themes can reuse the fill
      colour; light cannot (status-bar spec's light-theme pass). */
   --warning-ink: var(--warning);
   --error: #e8938a;
   --error-subtle: rgba(232, 147, 138, 0.15);
   --info: #a6c0f0;
+
+  /* Status badges: a soft, solid (no alpha) tint of the hue behind the
+     full pastel as the text, one pair per status family. */
+  --badge-warning-bg: #38360f; /* clean yellow, not olive/brown; #ede884 on it: 9.7:1 */
+  --badge-warning-fg: var(--warning);
+  --badge-error-bg: #3d2228;
+  --badge-error-fg: var(--error);
+  --badge-success-bg: #18382a;
+  --badge-success-fg: var(--success);
+  --badge-accent-bg: #133a2a;
+  --badge-accent-fg: var(--accent-primary);
+  --badge-info-bg: #1d2b45;
+  --badge-info-fg: var(--info);
+  --badge-neutral-bg: var(--bg-elevated);
+  --badge-neutral-fg: var(--text-secondary);
 
   /* Document-type Colors (spec rail) */
   --doc-spec: #e5cd8e;
@@ -78,14 +95,15 @@
   --diff-del-mark-fg: #ffebe9;
 
   /* Borders */
-  --border-subtle: #2a2d2d;
-  --divider: rgba(255, 255, 255, 0.16); /* every divider line, 1px */
-  --border-default: #343434;
-  --border-strong: #3b3e3e;
+  --border-subtle: #2a2b2c;
+  --divider: #2a2b2c; /* every divider line, 1px */
+  /* Inputs and controls: one step above the hairline (VS Code's search
+     field stroke), so they still read on the #191a1b ground. */
+  --border-default: #2f3031;
+  --border-strong: #3c3d3e;
   /* The layout cards' stroke (#sidebar rail + panel, #terminal, #dock, the
-     right panels): a very soft hairline that barely sets each card off the
-     --bg-deep ground, VS Code style. */
-  --card-border: rgba(255, 255, 255, 0.05);
+     right panels): the soft #2a2b2c hairline. */
+  --card-border: #2a2b2c;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -189,6 +207,19 @@
   --error-subtle: rgba(184, 64, 64, 0.12);
   --info: #376090;
 
+  --badge-warning-bg: #f8ecd2;
+  --badge-warning-fg: var(--warning-ink);
+  --badge-error-bg: #f6dedc;
+  --badge-error-fg: var(--error);
+  --badge-success-bg: #dfeee1;
+  --badge-success-fg: var(--success);
+  --badge-accent-bg: #dbefe4;
+  --badge-accent-fg: #2a7255;
+  --badge-info-bg: #dde7f4;
+  --badge-info-fg: var(--info);
+  --badge-neutral-bg: var(--bg-tertiary);
+  --badge-neutral-fg: var(--text-secondary);
+
   /* One soft stroke for every line on the light ground — borders, dividers,
      cards, badges, hover — solid, not alpha, so it reads the same over
      every surface it crosses. */
@@ -236,9 +267,9 @@
 
   --border-subtle: #2b2b2b;
   --divider: rgba(255, 255, 255, 0.16); /* every divider line, 1px */
-  --border-default: #2b2b2b;
-  --border-strong: #3c3c3c;
-  --card-border: rgba(255, 255, 255, 0.05);
+  --border-default: #3d3d3d;
+  --border-strong: #4a4a4a;
+  --card-border: #3d3d3d;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.36);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.36);

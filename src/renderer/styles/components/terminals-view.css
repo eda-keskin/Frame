@@ -1,6 +1,6 @@
 /* ==================== TERMINALS VIEW (terminals-view spec) ==================== */
 /* Prototype visual language: grid panes darker than the surrounding chrome,
-   compact layout bar, dashed ghost pane, grab-to-reorder headers.
+   compact layout bar, solid ghost pane, grab-to-reorder headers.
 
    The enlarged (single) pane is the exception, by design
    (compact-center-vs-code-density): with the view flat to the window edge
@@ -164,13 +164,29 @@
   padding: 16px;
 }
 
+/* ─── Grid card variants ───
+   Every cell in the grid — a terminal pane or the "New terminal" ghost — is
+   one card with the same box (height, radius, 1px solid border). Only the
+   border colour says which of three variants it is:
+     default  — a terminal that is not selected: thin grey
+     selected — the active terminal: one solid line in the primary green
+     new      — the "New terminal" ghost: the default card, empty, with a
+                centered label
+   Hover only firms the grey up; green always means "selected". No dashes. */
+.terminals-view {
+  --tv-card-height: 300px;
+  --tv-card-border: var(--border-default);
+  --tv-card-border-hover: var(--border-strong);
+  --tv-card-border-selected: var(--accent-primary);
+}
+
 .tv-pane {
   display: flex;
   flex-direction: column;
-  background: #161717;
-  border: 1px solid var(--border-default);
+  background: #121314;
+  border: 1px solid var(--tv-card-border);
   border-radius: var(--radius-lg);
-  height: 300px;
+  height: var(--tv-card-height);
   min-height: 160px;
   resize: vertical;
   overflow: hidden;
@@ -182,12 +198,12 @@
 }
 
 .tv-pane:hover {
-  border-color: var(--border-strong);
+  border-color: var(--tv-card-border-hover);
 }
 
-.tv-pane.active {
-  border-color: color-mix(in srgb, var(--accent-primary) 45%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+.tv-pane.active,
+.tv-pane.active:hover {
+  border-color: var(--tv-card-border-selected);
 }
 
 .tv-pane.dragging {
@@ -195,8 +211,7 @@
 }
 
 .tv-pane.dropover {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 1px var(--accent-primary);
+  border-color: var(--tv-card-border-selected);
 }
 
 .tv-pane-header {
@@ -228,19 +243,25 @@
    the loud part; approval is the strongest call in the vocabulary. */
 
 .tv-pane-status {
-  color: var(--text-tertiary);
+  font-family: var(--font-sans);
   font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  padding: 0 8px;
+  border-radius: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
 }
 
-.tv-pane-status.agent-working  { color: var(--accent-primary); }
-.tv-pane-status.agent-approval { color: var(--error, #d45555); font-weight: 600; }
-.tv-pane-status.agent-input    { color: var(--warning, #e5a50a); }
-.tv-pane-status.running        { color: var(--success, #23d18b); }
-.tv-pane-status.idle           { color: var(--text-tertiary); }
+/* Every status sits in a badge so it reads as a state, not as loose
+   coloured text: the full pastel on a soft solid tint of the same hue. */
+.tv-pane-status.agent-working  { color: var(--badge-accent-fg); background: var(--badge-accent-bg); }
+.tv-pane-status.agent-approval { color: var(--badge-error-fg); background: var(--badge-error-bg); }
+.tv-pane-status.agent-input    { color: var(--badge-warning-fg); background: var(--badge-warning-bg); }
+.tv-pane-status.running        { color: var(--badge-success-fg); background: var(--badge-success-bg); }
+.tv-pane-status.idle           { color: var(--text-secondary); background: var(--bg-tertiary); }
 
 .tv-pane-attention {
   font-size: 11px;
@@ -295,22 +316,38 @@ span.tv-pane-assign {
   gap: 4px;
 }
 
+/* Frameless icon buttons, like the Home cards' open arrow: a 24px target
+   around a 16px icon with a true 2px stroke. No border at rest or on hover;
+   hover only lights the background. */
 .tv-pane-btn {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 19px;
+  width: 24px;
+  height: 24px;
   background: none;
-  border: 1px solid var(--border-default);
-  border-radius: 3px;
+  border: none;
+  border-radius: 4px;
   color: var(--text-tertiary);
   cursor: pointer;
   padding: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.tv-pane-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+/* Lucide draws on a 24-unit grid; non-scaling keeps the stroke at 2 screen
+   pixels at 16px. */
+.tv-pane-btn svg * {
+  vector-effect: non-scaling-stroke;
 }
 
 .tv-pane-btn:hover {
-  color: var(--accent-primary);
-  border-color: color-mix(in srgb, var(--accent-primary) 45%, transparent);
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .tv-pane-content {
@@ -325,18 +362,22 @@ span.tv-pane-assign {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  min-height: 120px;
-  border: 1px dashed var(--border-strong);
+  gap: 8px;
+  /* The "new" card variant: the same box as a .tv-pane. */
+  height: var(--tv-card-height, 300px);
+  min-height: 160px;
+  border: 1px solid var(--tv-card-border, var(--border-default));
   border-radius: var(--radius-lg);
-  color: var(--text-tertiary);
+  background: transparent;
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .tv-ghost:hover {
-  color: var(--accent-primary);
-  border-color: color-mix(in srgb, var(--accent-primary) 45%, transparent);
+  color: var(--text-primary);
+  border-color: var(--tv-card-border-hover, var(--border-strong));
 }
 
 /* The first-terminal ghost. A grid cell the size of a pane (same 300px as
@@ -348,18 +389,19 @@ span.tv-pane-assign {
 .tv-ghost.tv-empty {
   flex-direction: column;
   gap: 6px;
-  height: 300px;
-  min-height: 160px;
   padding: 24px;
-  background: transparent;
+  color: var(--text-tertiary);
   font-family: var(--font-sans);
   text-align: center;
 }
 
-.tv-ghost.tv-empty:hover,
+.tv-ghost.tv-empty:hover {
+  color: var(--text-primary);
+}
+
 .tv-ghost.tv-empty:focus-visible {
-  color: var(--accent-primary);
-  border-color: color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
   outline: none;
 }
 
@@ -585,12 +627,6 @@ span.tv-pane-assign {
   font-variant-numeric: tabular-nums;
 }
 
-.workspace-nav-agents {
-  color: var(--accent-primary);
-  font-size: 9px;
-  font-weight: 700;
-}
-
 /* Project Settings: the one ungrouped row, pinned at the foot below the
    groups and set apart by a hairline (dock-panel-readonly-views spec, D1).
    Its text lines up with the group headers. */
@@ -625,8 +661,3 @@ span.tv-pane-assign {
   padding: 0 4px;
   line-height: 14px;
 }
-
-/* Waiting on the user: the same two colours every other surface uses for
-   these two statuses (§7). */
-.workspace-nav-agents.agent-approval { color: var(--error, #d45555); }
-.workspace-nav-agents.agent-input    { color: var(--warning, #e5a50a); }

@@ -24,7 +24,7 @@ const ANSI_VSCODE_DARK = {
   black: '#000000',
   red: '#cd3131',
   green: '#0dbc79',
-  yellow: '#e5e510',
+  yellow: '#ede884',
   blue: '#2472c8',
   magenta: '#bc3fbc',
   cyan: '#11a8cd',
@@ -32,7 +32,7 @@ const ANSI_VSCODE_DARK = {
   brightBlack: '#666666',
   brightRed: '#f14c4c',
   brightGreen: '#23d18b',
-  brightYellow: '#f5f543',
+  brightYellow: '#f3efa3',
   brightBlue: '#3b8eea',
   brightMagenta: '#d670d6',
   brightCyan: '#29b8db',
@@ -85,7 +85,7 @@ const THEMES = Object.freeze({
     command: 'theme.dark',
     scheme: 'dark',
     ansi: ANSI_VSCODE_DARK,
-    terminal: { background: '#161717', foreground: '#c4c6c6', cursor: '#8ff0ae' }
+    terminal: { background: '#121314', foreground: '#c4c6c6', cursor: '#8ff0ae' }
   },
   light: {
     label: 'Light',
