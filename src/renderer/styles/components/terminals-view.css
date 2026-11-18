@@ -2,11 +2,10 @@
 /* Prototype visual language: grid panes darker than the surrounding chrome,
    compact layout bar, solid ghost pane, grab-to-reorder headers.
 
-   The enlarged (single) pane is the exception, by design
-   (compact-center-vs-code-density): with the view flat to the window edge
-   there is no chrome left for it to be darker than, so it draws no border,
-   no radius and no background of its own — the terminal sits directly on
-   the surface, VS Code-style. Only the grid keeps the darker pane. */
+   The enlarged (single) pane was borderless by design
+   (compact-center-vs-code-density); the user overturned that on 2026-11-16:
+   it is now a card with the default hairline and the 8px card radius, set
+   8px inside the center so its edge does not merge with the center's. */
 
 .terminal-content.terminals-view-mode {
   overflow: hidden;
@@ -31,6 +30,7 @@
   display: flex;
   flex: 1;
   min-height: 0;
+  padding: 8px;
 }
 
 .tv-pane.tv-pane-single {
@@ -38,8 +38,10 @@
   height: auto;
   min-height: 0;
   resize: none;
-  border: none;
-  border-radius: 0;
+  /* A card of its own: the default hairline with the 8px card radius, so
+     its edge stays visible (the user, 2026-11-16). */
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
   background: transparent;
 }
 
@@ -65,13 +67,11 @@
 /* One terminal filling the section is self-evidently the focused one. The
    accent ring exists to pick a pane out from the panes beside it; alone, it
    is just a bright box around the whole screen. */
-.tv-pane.tv-pane-single.active {
-  border-color: var(--border-default);
-  box-shadow: none;
-}
-
+.tv-pane.tv-pane-single.active,
+.tv-pane.tv-pane-single.active:hover,
 .tv-pane.tv-pane-single:hover {
   border-color: var(--border-default);
+  box-shadow: none;
 }
 
 /* The Other Terminals rail sits beside the terminal, keeping its own width
@@ -168,22 +168,24 @@
    Every cell in the grid — a terminal pane or the "New terminal" ghost — is
    one card with the same box (height, radius, 1px solid border). Only the
    border colour says which of three variants it is:
-     default  — a terminal that is not selected: thin grey
-     selected — the active terminal: one solid line in the primary green
+     default  — a terminal that is not selected: the default stroke
+     hover    — one 1px line in the primary green
+     selected — the active terminal: one 1px line in the primary green
      new      — the "New terminal" ghost: the default card, empty, with a
-                centered label
-   Hover only firms the grey up; green always means "selected". No dashes. */
+                centered green label; on hover only the stroke turns
+                green (the user, 2026-11-18)
+   No dashes. */
 .terminals-view {
   --tv-card-height: 300px;
   --tv-card-border: var(--border-default);
-  --tv-card-border-hover: var(--border-strong);
+  --tv-card-border-hover: var(--accent-primary);
   --tv-card-border-selected: var(--accent-primary);
 }
 
 .tv-pane {
   display: flex;
   flex-direction: column;
-  background: #121314;
+  background: var(--bg-primary);
   border: 1px solid var(--tv-card-border);
   border-radius: var(--radius-lg);
   height: var(--tv-card-height);
@@ -232,6 +234,8 @@
 }
 
 .tv-pane-name {
+  /* 8px header gap + 8px = 16px to the status beside it. */
+  margin-right: 8px;
   font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -245,37 +249,40 @@
 .tv-pane-status {
   font-family: var(--font-sans);
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 16px;
-  padding: 0 8px;
-  border-radius: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
 }
 
-/* Every status sits in a badge so it reads as a state, not as loose
-   coloured text: the full pastel on a soft solid tint of the same hue. */
-.tv-pane-status.agent-working  { color: var(--badge-accent-fg); background: var(--badge-accent-bg); }
-.tv-pane-status.agent-approval { color: var(--badge-error-fg); background: var(--badge-error-bg); }
-.tv-pane-status.agent-input    { color: var(--badge-warning-fg); background: var(--badge-warning-bg); }
-.tv-pane-status.running        { color: var(--badge-success-fg); background: var(--badge-success-bg); }
-.tv-pane-status.idle           { color: var(--text-secondary); background: var(--bg-tertiary); }
+/* The status is plain bold text in its state's colour — no badge fill
+   (the user, 2026-11-16). The pane is a dark grey (#1f1f1f–#202124) in
+   every dark theme, so the hues there are the dark palette's, fixed
+   (6.9–12.6:1). The light pane is
+   --bg-primary, so the light scheme takes its deep inks (5.4–6.3:1). */
+.tv-pane-status.agent-working  { color: #8ff0ae; }
+.tv-pane-status.agent-approval { color: #e8938a; }
+.tv-pane-status.agent-input    { color: #ede884; }
+.tv-pane-status.running        { color: #8ff0ae; }
+.tv-pane-status.idle           { color: #e4e4e4; }
 
-.tv-pane-attention {
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  flex-shrink: 0;
+[data-scheme="light"] .tv-pane-status.agent-working  { color: #2a7255; }
+[data-scheme="light"] .tv-pane-status.agent-approval { color: var(--error); }
+[data-scheme="light"] .tv-pane-status.agent-input    { color: var(--warning-ink); }
+[data-scheme="light"] .tv-pane-status.running        { color: var(--success); }
+[data-scheme="light"] .tv-pane-status.idle           { color: var(--text-primary); }
+
+/* In the pane header only the working agent's dot blinks; every other
+   state holds a steady dot (the shared dot elsewhere keeps its motion). */
+.tv-pane-header .lane-status-dot {
+  animation: none;
 }
 
-.tv-pane-attention:empty {
-  display: none;
+.tv-pane-header .lane-status-dot.agent-working {
+  animation: lane-pulse 1.2s ease-in-out infinite;
 }
-
-.tv-pane-attention.agent-approval { color: var(--error, #d45555); }
-.tv-pane-attention.agent-input    { color: var(--warning, #e5a50a); }
 
 /* The spec or task the enlarged terminal is working on. It takes the header's
    free space so it sits against the action buttons on the right; when it is
@@ -356,6 +363,14 @@ span.tv-pane-assign {
   padding: 4px 8px 8px;
 }
 
+/* Dark: the terminal's inside sinks to --bg-deep (the same #121314 as the
+   xterm background in themes.js), and the header takes the same ground so
+   the whole pane reads as one surface (the user, 2026-11-16). */
+[data-theme="dark"] .tv-pane-header,
+[data-theme="dark"] .tv-pane-content {
+  background: var(--bg-deep);
+}
+
 /* ─── Ghost pane / first-terminal ghost ─── */
 
 .tv-ghost {
@@ -369,15 +384,15 @@ span.tv-pane-assign {
   border: 1px solid var(--tv-card-border, var(--border-default));
   border-radius: var(--radius-lg);
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--accent-primary);
   cursor: pointer;
   font-size: 12px;
-  transition: border-color var(--transition-fast), color var(--transition-fast);
+  font-weight: 700;
+  transition: border-color var(--transition-fast);
 }
 
 .tv-ghost:hover {
-  color: var(--text-primary);
-  border-color: var(--tv-card-border-hover, var(--border-strong));
+  border-color: var(--accent-primary);
 }
 
 /* The first-terminal ghost. A grid cell the size of a pane (same 300px as
@@ -525,13 +540,14 @@ span.tv-pane-assign {
   color: var(--accent-primary);
 }
 
-/* A small drawn chevron: points down when open, right when folded. */
+/* A drawn chevron, 2px stroke: points down when open, right when folded. */
 .workspace-nav-group-chevron {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
   flex: none;
-  border-right: 1.5px solid var(--text-tertiary);
-  border-bottom: 1.5px solid var(--text-tertiary);
+  border-right: 2px solid var(--text-tertiary);
+  border-bottom: 2px solid var(--text-tertiary);
   transform: translateY(-2px) rotate(45deg);
   transition: transform 200ms ease;
 }

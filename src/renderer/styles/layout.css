@@ -96,42 +96,35 @@ body.sidebar-resizing * {
   cursor: col-resize !important;
 }
 
-/* Update banner — sidebar footer card, primary signal when an update is available */
+/* Update banner — sidebar footer card, primary signal when an update is
+   available. Disabled-button fill and stroke, 24px top/left inset, the
+   arrow is a green 32×32 button centred vertically on the right. */
 .sidebar-update-banner {
   flex-shrink: 0;
   margin-top: var(--space-md);
-  padding: 12px 12px;
-  background: var(--accent-subtle);
-  border: 1px solid var(--accent-primary);
+  padding: 24px 16px 24px 24px;
+  background: var(--disabled-bg);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-family: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-align: left;
   width: 100%;
   box-sizing: border-box;
-  transition: background 0.14s, border-color 0.14s, transform 0.08s;
+  transition: border-color 0.14s, transform 0.08s;
   animation: sidebar-update-pulse 2.6s ease-in-out infinite;
 }
 
 .sidebar-update-banner:hover {
-  background: var(--accent-glow);
-  border-color: var(--accent-secondary);
+  border-color: var(--success);
 }
 
 .sidebar-update-banner:active {
   transform: scale(0.98);
-}
-
-.sidebar-update-banner-icon {
-  font-size: 13px;
-  color: var(--accent-primary);
-  font-weight: 700;
-  flex-shrink: 0;
-  line-height: 1;
 }
 
 .sidebar-update-banner-text {
@@ -139,14 +132,14 @@ body.sidebar-resizing * {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 4px;
   overflow: hidden;
 }
 
 .sidebar-update-banner-title {
   font-size: 12px;
-  color: var(--accent-primary);
-  font-weight: 500;
+  color: var(--text-primary);
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -154,15 +147,27 @@ body.sidebar-resizing * {
 
 .sidebar-update-banner-version {
   font-size: 10px;
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   font-family: var(--font-sans);
 }
 
 .sidebar-update-banner-arrow {
-  font-size: 13px;
-  color: var(--accent-primary);
   flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--badge-success-solid-bg);
+  color: var(--badge-success-solid-fg);
+  font-size: 16px;
   line-height: 1;
+  transition: filter 0.14s;
+}
+
+.sidebar-update-banner:hover .sidebar-update-banner-arrow {
+  filter: brightness(1.08);
 }
 
 @keyframes sidebar-update-pulse {
@@ -292,6 +297,33 @@ body.sidebar-resizing * {
   display: flex;
   flex-direction: column;
   padding: 8px 12px 12px;
+}
+
+/* The project switcher heads the panel (moved from the app header,
+   2026-11-18): full width and taller than every control below it — 40px
+   against their 24–32px — with a larger name, so it reads as "which
+   project this panel is about" rather than one more button. */
+.sidebar-panel .sidebar-current-project-wrap {
+  flex: none;
+  max-width: none;
+  margin-bottom: 12px;
+}
+
+.sidebar-panel .sidebar-current-project {
+  height: 40px;
+  padding: 0 16px;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sidebar-panel .sidebar-current-project-label {
+  font-size: 10px;
+}
+
+.sidebar-panel .sidebar-project-menu {
+  width: 100%;
+  max-width: none;
 }
 
 /* ---- Agent view: default-agent controls + running-agents list ---- */

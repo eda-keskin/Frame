@@ -6,16 +6,25 @@
    inherits the rest — the green accent and the semantic colours included. */
 :root,
 [data-scheme="dark"] {
+  /* 2026-11-18 user palette: ground #1a1f21, the rail/sidebar and every
+     surface that sets itself apart from the ground #23292c, every stroke
+     #383e41, disabled buttons #32393b. The older notes below predate it. */
   /* Color Palette - near-black, faintly cool neutrals with a green accent,
-     sampled from VS Code's dark chrome (2026-11-16): the ground and the
-     side bar share #191a1b, the main card (terminal) sinks to #121314,
+     sampled from VS Code's dark chrome (2026-11-16), then retuned the same
+     day to the user's exact values: two tones only — the ground behind
+     the cards (and the terminals' inside) is #121314, and every card on it
+     (rail, sidebar panel, top bar, center, dock) is one grey #202122;
      widgets #252627, every hairline #2a2b2c. */
-  --bg-deep: #191a1b;
-  --bg-primary: #121314;
-  --bg-secondary: #191a1b;
+  --bg-deep: #1a1f21;
+  --bg-primary: #23292c;
+  --bg-secondary: #23292c;
   --bg-tertiary: #252627;
   --bg-elevated: #2d2e2f;
-  --bg-hover: #2a2b2c;
+  /* Button hover (pane ×, ✎, ⤢ …), dropdown fill and disabled buttons all
+     share #32393b (the user, 2026-11-18; --text-muted on it: 4.8:1). */
+  --bg-hover: #32393b;
+  --control-bg: #32393b;
+  --disabled-bg: #32393b;
 
   /* Text Colors */
   /* Every text token clears WCAG AA (4.5:1) on every surface up to
@@ -34,7 +43,7 @@
 
   /* Accent Colors */
   --accent-primary: #8ff0ae;
-  --accent-secondary: #6fd693;
+  --accent-secondary: #8ff0ae; /* one green everywhere (the user, 2026-11-18) */
   --accent-subtle: rgba(143, 240, 174, 0.15);
   --accent-glow: rgba(143, 240, 174, 0.08);
 
@@ -45,16 +54,18 @@
   --selected-fg: var(--text-primary);
   --selected-border: var(--selected-bg);
 
-  /* Dropdown menus (components/menu.css): macOS-style translucent panel. */
-  --menu-bg: rgba(37, 38, 39, 0.86);
+  /* Dropdown menus (components/menu.css): the surface grey #23292c, and
+     the highlighted row takes the disabled-button fill (the user,
+     2026-11-18). */
+  --menu-bg: var(--bg-primary);
   --menu-border: rgba(255, 255, 255, 0.14);
   --menu-outline: rgba(0, 0, 0, 0.6);
-  --menu-hover: rgba(255, 255, 255, 0.10);
+  --menu-hover: var(--disabled-bg);
   --menu-separator: rgba(255, 255, 255, 0.12);
 
   /* Semantic Colors */
-  --success: #9bdca8;
-  --success-subtle: rgba(155, 220, 168, 0.15);
+  --success: #8ff0ae; /* = --accent-primary: one green (2026-11-18) */
+  --success-subtle: rgba(143, 240, 174, 0.15);
   --warning: #ede884;
   /* Warning text sitting on a warning tint. Dark themes can reuse the fill
      colour; light cannot (status-bar spec's light-theme pass). */
@@ -69,7 +80,7 @@
   --badge-warning-fg: var(--warning);
   --badge-error-bg: #3d2228;
   --badge-error-fg: var(--error);
-  --badge-success-bg: #18382a;
+  --badge-success-bg: #133a2a;
   --badge-success-fg: var(--success);
   --badge-accent-bg: #133a2a;
   --badge-accent-fg: var(--accent-primary);
@@ -78,11 +89,25 @@
   --badge-neutral-bg: var(--bg-elevated);
   --badge-neutral-fg: var(--text-secondary);
 
+  /* Solid status badges: the full hue as an opaque fill, one near-black ink
+     (#171b22) as the text (all AA: warning 13.6, error 7.4, success 10.9,
+     accent 12.5:1). */
+  --badge-warning-solid-bg: var(--warning);
+  --badge-warning-solid-fg: #171b22;
+  --badge-error-solid-bg: var(--error);
+  --badge-error-solid-fg: #171b22;
+  --badge-success-solid-bg: var(--success);
+  --badge-success-solid-fg: #171b22;
+  --badge-accent-solid-bg: var(--accent-primary);
+  --badge-accent-solid-fg: #171b22;
+  --badge-info-solid-bg: var(--info);
+  --badge-info-solid-fg: #171b22;
+
   /* Document-type Colors (spec rail) */
   --doc-spec: #e5cd8e;
   --doc-plan: #a6c0f0;
   --doc-task: #efbe93;
-  --doc-outcome: #9bdca8;
+  --doc-outcome: #8ff0ae;
 
   /* Diff colors (GitHub-style, dark) */
   --diff-ins-bg: rgba(63, 185, 80, 0.15);
@@ -95,15 +120,15 @@
   --diff-del-mark-fg: #ffebe9;
 
   /* Borders */
-  --border-subtle: #2a2b2c;
-  --divider: #2a2b2c; /* every divider line, 1px */
-  /* Inputs and controls: one step above the hairline (VS Code's search
-     field stroke), so they still read on the #191a1b ground. */
-  --border-default: #2f3031;
+  --border-subtle: #383e41;
+  --divider: #383e41; /* every divider line, 1px */
+  /* Inputs and controls: the same #2a2b2c hairline as every other stroke
+     (the user, 2026-11-16). */
+  --border-default: #383e41;
   --border-strong: #3c3d3e;
   /* The layout cards' stroke (#sidebar rail + panel, #terminal, #dock, the
      right panels): the soft #2a2b2c hairline. */
-  --card-border: #2a2b2c;
+  --card-border: #383e41;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -161,6 +186,8 @@
   --bg-tertiary: #e1e1e5;
   --bg-elevated: #d6d6db;
   --bg-hover: #e3e3e7;
+  --control-bg: var(--bg-tertiary);
+  --disabled-bg: var(--bg-tertiary);
   /* Home composer and cards: a step above the ground, not stark white. */
   --surface-card: #fdfdfd;
 
@@ -219,6 +246,19 @@
   --badge-info-fg: var(--info);
   --badge-neutral-bg: var(--bg-tertiary);
   --badge-neutral-fg: var(--text-secondary);
+
+  /* Solid status badges (light): yellow keeps the dark ink #171b22 (10.7:1); the
+     deeper red/green fills carry white (6.5 / 6.4 / 5.8:1). */
+  --badge-warning-solid-bg: #ecc94b;
+  --badge-warning-solid-fg: #171b22;
+  --badge-error-solid-bg: var(--error);
+  --badge-error-solid-fg: #ffffff;
+  --badge-success-solid-bg: var(--success);
+  --badge-success-solid-fg: #ffffff;
+  --badge-accent-solid-bg: #2a7255;
+  --badge-accent-solid-fg: #ffffff;
+  --badge-info-solid-bg: var(--info);
+  --badge-info-solid-fg: #ffffff;
 
   /* One soft stroke for every line on the light ground — borders, dividers,
      cards, badges, hover — solid, not alpha, so it reads the same over

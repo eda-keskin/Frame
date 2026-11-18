@@ -427,7 +427,7 @@
   font-weight: 600;
   line-height: 16px;
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
 }
 
@@ -3332,7 +3332,7 @@
   font-weight: 600;
   line-height: 16px;
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
 }
 
@@ -3343,30 +3343,30 @@
 
 .spec-phase-badge.phase-specified,
 .spec-phase-badge.phase-planned {
-  background: var(--badge-info-bg);
-  color: var(--badge-info-fg);
+  background: var(--badge-info-solid-bg);
+  color: var(--badge-info-solid-fg);
 }
 
 .spec-phase-badge.phase-tasks_generated {
-  background: var(--badge-warning-bg);
-  color: var(--badge-warning-fg);
+  background: var(--badge-warning-solid-bg);
+  color: var(--badge-warning-solid-fg);
 }
 
 .spec-phase-badge.phase-implementing {
-  background: var(--badge-accent-bg);
-  color: var(--badge-accent-fg);
+  background: var(--badge-accent-solid-bg);
+  color: var(--badge-accent-solid-fg);
 }
 
 .spec-phase-badge.phase-done {
-  background: var(--badge-success-bg);
-  color: var(--badge-success-fg);
+  background: var(--badge-success-solid-bg);
+  color: var(--badge-success-solid-fg);
 }
 
 /* A spec folder Frame could not read as a spec (issue #122). Warning
    colours, not error: the folder is fine, its status.json needs a field. */
 .spec-phase-badge.phase-malformed {
-  background: var(--badge-warning-bg);
-  color: var(--warning-ink);
+  background: var(--badge-warning-solid-bg);
+  color: var(--badge-warning-solid-fg);
 }
 
 .specs-card-malformed {

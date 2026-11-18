@@ -4,8 +4,8 @@
  * The project's default center view, in two bodies. The grid is every
  * terminal of the project as a live pane at once — 1/2/3 columns, headers
  * dragged to reorder. A pane's ⤢ enlarges that one terminal to fill the
- * section; the way back out is the top bar's Terminals chip, which is always
- * there — an enlarged pane carries no shrink control of its own.
+ * section; the way back out is the enlarged pane's own ⤡ (added 2026-11-18)
+ * or the top bar's Terminals chip, which is always there.
  *
  * The navigation is *not* here. Every live terminal of the project is a chip
  * in the top bar beside Terminals itself (terminalTabBar), whether it has
@@ -25,10 +25,10 @@
  */
 
 const laneStatus = require('./laneStatus');
-const { statusLabel, attentionMark, assignmentIcon, assignmentText } = laneStatus;
+const { statusLabel, assignmentIcon, assignmentText } = laneStatus;
 const otherTerminalsRail = require('./otherTerminalsRail');
 const { escapeHtml } = require('./htmlUtils');
-const { Plus, Maximize2, Pencil, X, MousePointerClick } = require('lucide');
+const { Plus, Maximize2, Minimize2, Pencil, X, MousePointerClick, ChevronDown } = require('lucide');
 
 const PREFS_KEY = 'frame-terminals-view';
 const GLOBAL_PROJECT_KEY = '__global__';
@@ -93,14 +93,6 @@ class TerminalsView {
       const { status, agentName, foreground, commandLine } = laneStatus.getStatus(terminalId);
       const dot = pane.querySelector('.lane-status-dot');
       if (dot) dot.className = `lane-status-dot ${status}`;
-
-      const mark = attentionMark(status);
-      const attention = pane.querySelector('.tv-pane-attention');
-      if (attention) {
-        attention.className = `tv-pane-attention ${status}`;
-        attention.textContent = mark || '';
-        attention.setAttribute('aria-hidden', String(!mark));
-      }
 
       const label = pane.querySelector('.tv-pane-status');
       if (label) {
@@ -369,7 +361,6 @@ class TerminalsView {
    */
   _buildPane(state, prefs, { single = false } = {}) {
     const { status, agentName, foreground, commandLine } = laneStatus.getStatus(state.id);
-    const mark = attentionMark(status);
     const assignment = single ? state.assignment : null;
     const pane = document.createElement('div');
     pane.className = `tv-pane ${state.isActive ? 'active' : ''} ${single ? 'tv-pane-single' : ''}`;
@@ -379,19 +370,18 @@ class TerminalsView {
       <div class="tv-pane-header${assignment ? ' has-assign' : ''}" draggable="${!single}" title="${single ? '' : 'Drag to reorder'}">
         <span class="lane-status-dot ${status}"></span>
         <span class="tv-pane-name">${escapeHtml(state.customName || state.name)}</span>
-        <span class="tv-pane-attention ${status}" aria-hidden="${!mark}">${mark || ''}</span>
         <span class="tv-pane-status ${status}" title="${escapeHtml(commandLine || '')}">${escapeHtml(statusLabel(status, { agentName, foreground, commandLine, short: true }))}</span>
         ${this._buildAssignmentChip(assignment, agentName)}
         <span class="tv-pane-actions">
           <button class="tv-pane-btn" data-rename title="Rename terminal">${lucideIcon(Pencil, 11)}</button>
-          ${single ? '' : `<button class="tv-pane-btn" data-enlarge title="Enlarge this terminal">${lucideIcon(Maximize2, 12)}</button>`}
+          ${single
+            ? `<button class="tv-pane-btn" data-shrink title="Back to all terminals">${lucideIcon(Minimize2, 12)}</button>`
+            : `<button class="tv-pane-btn" data-enlarge title="Enlarge this terminal">${lucideIcon(Maximize2, 12)}</button>`}
           <button class="tv-pane-btn" data-close title="Close terminal">${lucideIcon(X, 12)}</button>
         </span>
       </div>
       <div class="tv-pane-content"></div>
-      <button class="btn-scroll-bottom-overlay btn-scroll-bottom-cell" title="Scroll to bottom">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
+      <button class="btn-scroll-bottom-overlay btn-scroll-bottom-cell" title="Scroll to bottom">${lucideIcon(ChevronDown, 16)}</button>
     `;
 
     this._setupPaneEvents(pane, state.id, { single });
@@ -476,6 +466,15 @@ class TerminalsView {
     pane.querySelector('[data-enlarge]')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this._goToTerminal(terminalId);
+    });
+
+    // ⤡ on the enlarged pane: back to the grid — the same route as the top
+    // bar's Terminals chip, through the host so the chip highlight follows
+    // (the user, 2026-11-18: the × alone read as "close this view").
+    pane.querySelector('[data-shrink]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.callbacks.onShowTerminals) this.callbacks.onShowTerminals();
+      else this.showOverview();
     });
 
     // The chip opens the spec or task this terminal is working on, reusing

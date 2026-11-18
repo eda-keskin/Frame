@@ -39,6 +39,20 @@ const ANSI_VSCODE_DARK = {
   brightWhite: '#e5e5e5'
 };
 
+/**
+ * Frame Dark's terminal colours: VS Code's dark table with Frame's own hues
+ * where Claude Code's ANSI theme shows them (the user, 2026-11-18) — green
+ * is the accent #8ff0ae, cyan the info blue #a6c0f0, yellow the warning
+ * #ede884 (already in the VS Code table).
+ */
+const ANSI_FRAME_DARK = {
+  ...ANSI_VSCODE_DARK,
+  green: '#8ff0ae',
+  brightGreen: '#8ff0ae',
+  cyan: '#a6c0f0',
+  brightCyan: '#a6c0f0'
+};
+
 /** VS Code's default light terminal colours. */
 const ANSI_VSCODE_LIGHT = {
   black: '#000000',
@@ -84,8 +98,8 @@ const THEMES = Object.freeze({
     label: 'Dark',
     command: 'theme.dark',
     scheme: 'dark',
-    ansi: ANSI_VSCODE_DARK,
-    terminal: { background: '#121314', foreground: '#c4c6c6', cursor: '#8ff0ae' }
+    ansi: ANSI_FRAME_DARK,
+    terminal: { background: '#1a1f21', foreground: '#c4c6c6', cursor: '#8ff0ae' }
   },
   light: {
     label: 'Light',

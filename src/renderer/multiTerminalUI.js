@@ -101,7 +101,8 @@ class MultiTerminalUI {
     });
     this.terminalsView = new TerminalsView(this.manager, {
       onNewTerminal: () => this._createLaneOrNotify(),
-      onEnterLane: (terminalId) => this.enterLane(terminalId)
+      onEnterLane: (terminalId) => this.enterLane(terminalId),
+      onShowTerminals: () => this.showTerminals()
     });
 
     // Wire up top bar callbacks

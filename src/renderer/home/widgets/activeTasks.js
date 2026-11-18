@@ -58,7 +58,7 @@ module.exports = {
     card.count.textContent = String(active.length);
 
     const warning = specWaiting.length
-      ? `<button type="button" class="home-card-warn">${lucideIcon(AlertTriangle, 12)}<span>${specWaiting.length} task${specWaiting.length === 1 ? '' : 's'} in ${specCount} spec${specCount === 1 ? '' : 's'} waiting to be implemented</span></button>`
+      ? `<button type="button" class="home-card-warn">${lucideIcon(AlertTriangle, 16)}<span>${specWaiting.length} task${specWaiting.length === 1 ? '' : 's'} in ${specCount} spec${specCount === 1 ? '' : 's'} waiting to be implemented</span></button>`
       : '';
 
     // Nothing of our own in either state — the card explains itself instead.

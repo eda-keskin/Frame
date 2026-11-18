@@ -169,16 +169,16 @@ svg[stroke="currentColor"]:not(.sidebar-rail-btn svg, [width="20"], [width="22"]
   border: none;
   color: #07130b;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(155, 220, 168, 0.3);
+  box-shadow: 0 2px 8px rgba(143, 240, 174, 0.3);
 }
 
 .btn-success:hover {
   background: linear-gradient(180deg, #b4e8bf 0%, var(--success) 100%);
-  box-shadow: 0 4px 16px rgba(155, 220, 168, 0.4);
+  box-shadow: 0 4px 16px rgba(143, 240, 174, 0.4);
 }
 
 .btn:disabled {
-  background: var(--bg-tertiary);
+  background: var(--disabled-bg);
   border-color: var(--border-subtle);
   color: var(--text-muted);
   cursor: not-allowed;

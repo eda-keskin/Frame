@@ -29,10 +29,11 @@
   align-items: center;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
-  /* Square, one bottom border (compact-center-vs-code-density); 43px —
-     VS Code's 35px plus the 8px the user added on 2026-10-07. */
+  /* Square, one bottom border (compact-center-vs-code-density). 48px so
+     its bottom line sits level with the sidebar's project switcher's
+     bottom edge (8px panel inset + 40px switcher; the user, 2026-11-18). */
   padding: 0 8px;
-  height: 43px;
+  height: 48px;
   border-radius: 0;
 }
 
@@ -140,23 +141,38 @@
   bottom: 16px;
   right: 16px;
   z-index: 20;
-  width: 28px;
-  height: 28px;
-  background: var(--bg-elevated);
+  /* The rail button's shape (.sidebar-rail-btn): a 32px rounded square
+     with a 16px icon at a true 2px stroke, not a soft grey circle. It
+     floats over terminal output, so it keeps a solid fill and a hairline. */
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  box-sizing: border-box;
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-default);
-  border-radius: 50%;
+  border-radius: var(--radius-md);
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-fast);
-  opacity: 0.75;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-scroll-bottom-overlay svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+/* Lucide draws on a 24-unit grid; keep the stroke at 2 screen pixels. */
+.btn-scroll-bottom-overlay svg * {
+  vector-effect: non-scaling-stroke;
 }
 
 .btn-scroll-bottom-overlay:hover {
-  opacity: 1;
   background: var(--bg-hover);
   color: var(--text-primary);
   border-color: var(--accent-primary);

@@ -1,7 +1,7 @@
 {
   "version": "1.1",
   "description": "Auto-generated module structure",
-  "lastUpdated": "2026-11-16",
+  "lastUpdated": "2026-11-18",
   "architecture": {},
   "modules": {
     ".claude/settings.json": {
@@ -290,7 +290,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 93948,
+      "sizeBytes": 93923,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -11480,7 +11480,7 @@
           "SESSION_RESTORE_SET_LAST_PROJECT"
         ]
       },
-      "sizeBytes": 35201,
+      "sizeBytes": 35252,
       "extraction": {
         "status": "parsed"
       },
@@ -15070,7 +15070,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 13648,
+      "sizeBytes": 13988,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15214,7 +15214,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 38931,
+      "sizeBytes": 39155,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15262,7 +15262,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 104536,
+      "sizeBytes": 104625,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15370,7 +15370,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 36497,
+      "sizeBytes": 36509,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15382,7 +15382,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 4012,
+      "sizeBytes": 4662,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15394,7 +15394,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 17345,
+      "sizeBytes": 18230,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15454,7 +15454,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 11775,
+      "sizeBytes": 12673,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -15478,7 +15478,7 @@
       "exports": [],
       "depends": [],
       "functions": {},
-      "sizeBytes": 10903,
+      "sizeBytes": 12791,
       "extraction": {
         "status": "unsupported",
         "reason": "no-extractor"
@@ -16702,7 +16702,7 @@
           ]
         }
       },
-      "sizeBytes": 26487,
+      "sizeBytes": 26450,
       "extraction": {
         "status": "parsed"
       },
@@ -16724,28 +16724,28 @@
       "depends": [],
       "functions": {
         "normalize": {
-          "line": 119,
+          "line": 133,
           "params": [
             "name"
           ],
           "purpose": "A valid theme id for any input — unknown, missing or garbage falls back to the default."
         },
         "schemeOf": {
-          "line": 124,
+          "line": 138,
           "params": [
             "name"
           ],
           "purpose": "'dark' | 'light' for a theme id (normalized first)."
         },
         "terminalTheme": {
-          "line": 129,
+          "line": 143,
           "params": [
             "name"
           ],
           "purpose": "The xterm.js `theme` option for a theme id."
         }
       },
-      "sizeBytes": 3973,
+      "sizeBytes": 4393,
       "extraction": {
         "status": "parsed"
       },
@@ -28521,6 +28521,6 @@
       "truncated": false,
       "samples": []
     },
-    "revision": "1296278d7795ec4c844018ad4e216d6a290345dae54bec808fe9cb79f691e22c"
+    "revision": "7cf5e11bd8a3d728a899fbd4efa9b32cabb9a4b6ea20990b5508f3da306d4a3f"
   }
 }

@@ -534,7 +534,7 @@
   font-weight: 600;
   line-height: 16px;
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
   background: var(--badge-accent-bg);
   color: var(--badge-accent-fg);
