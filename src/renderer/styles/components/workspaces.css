@@ -1,0 +1,1127 @@
+/* ==================== WORKSPACES (workspaces spec) ==================== */
+/* The workspace switcher: the second level under the project switcher,
+   drawn as one more nav group — the same header as Work and Context (a
+   chevron and a semibold title, from terminals-view.css's
+   .project-nav-group-*), with the rows hanging off the same guide line and
+   folding the same way. Inside, the rows keep their own shape: Local /
+   Remote groups, a second line for the color name, badges. */
+
+.workspace-section {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 0;
+  margin: 4px 0 4px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.workspace-section[hidden] { display: none; }
+
+/* Collapsed, the header names the selected workspace on its right. */
+.ws-head-current {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-left: auto;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  font-size: 12px;
+}
+.ws-head-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ws-switch .project-nav-group-label { flex: none; }
+
+/* "remote" / "offline" beside the selected workspace's name. */
+.ws-switch-tag {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--bg-hover);
+  color: var(--text-tertiary);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  line-height: 15px;
+  text-transform: uppercase;
+}
+.ws-switch-tag.offline { color: var(--warning); }
+
+/* The rows: the nav group's guide line and fold; a long list scrolls on its
+   own so Work below stays in reach. */
+.workspace-section .ws-menu {
+  gap: 1px;
+  font-size: 12px;
+  line-height: 18px;
+  max-height: min(420px, 45vh);
+  overflow-y: auto;
+}
+
+/* Rows hang off the guide line like Work's: the selected one gets the
+   active background and an accent edge against the line (drawn inside the
+   row — the list scrolls, so anything outside it would be clipped). */
+.workspace-section .ws-row {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.workspace-section .ws-row.on {
+  background: var(--bg-tertiary);
+  box-shadow: inset 2px 0 0 var(--accent-primary);
+}
+.workspace-section .ws-row.on .ws-primary { color: var(--text-primary); }
+
+.ws-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ws-group-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  padding: 2px 2px 2px 8px;
+}
+
+/* Same small caps as the switchers' "Project" / "Workspace" labels. */
+.ws-group-label {
+  flex: 1;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  user-select: none;
+}
+
+/* The host the Remote group lives on, with the link's state as a dot. */
+.ws-group-host {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.ws-link-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+.ws-group-host.up .ws-link-dot { background: var(--success); }
+.ws-group-host.busy .ws-link-dot { background: var(--warning); animation: ws-pulse 1.6s ease-in-out infinite; }
+.ws-group-host.setup .ws-link-dot { background: var(--warning); }
+
+.ws-group-add {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.ws-group-add:hover:not(:disabled),
+.ws-group-link:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.ws-group-add:disabled { opacity: 0.4; cursor: default; }
+
+.ws-group-link {
+  flex: none;
+  padding: 0 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--accent-primary);
+  font: inherit;
+  font-size: 11px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+/* Empty Remote: one line of why, one button for the next step. */
+.ws-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 2px 8px 8px;
+}
+
+.ws-empty-text {
+  margin: 0;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-tertiary);
+}
+
+.ws-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.ws-cta:hover:not(:disabled),
+.ws-cta:focus-visible {
+  border-style: solid;
+  border-color: var(--accent-primary);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.ws-cta:disabled { opacity: 0.45; cursor: default; }
+
+.ws-archived {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* Rows: the project menu's item rhythm, with a second line for the color
+   name and the badges. The selected row is marked like Work's active row
+   (see .workspace-section .ws-row.on above). */
+.ws-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 4px 4px 4px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.ws-row:hover { background: var(--bg-hover); color: var(--text-primary); }
+.ws-row:focus-visible { box-shadow: inset 0 0 0 1px var(--accent-primary); }
+
+.ws-row.on { color: var(--text-primary); }
+.ws-row.on .ws-primary { color: var(--accent-primary); }
+
+
+.ws-row.missing { opacity: 0.7; cursor: default; }
+.ws-row.archived { cursor: default; }
+
+.ws-labels {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.ws-primary,
+.ws-secondary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ws-primary { font-weight: 500; }
+
+.ws-secondary {
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--text-tertiary);
+}
+
+.ws-row.missing .ws-secondary { color: var(--warning); }
+
+/* Status dot: urgent states use the project switcher's colors. */
+.ws-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+.ws-dot.approval { background: var(--error); }
+.ws-dot.input { background: var(--warning); }
+.ws-dot.working {
+  background: var(--accent-primary);
+  animation: ws-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes ws-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-dot.working,
+  .ws-group-host.busy .ws-link-dot { animation: none; }
+}
+
+.ws-more,
+.ws-act {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font: inherit;
+}
+
+.ws-more {
+  width: 22px;
+  height: 22px;
+  visibility: hidden;
+}
+
+.ws-row:hover .ws-more,
+.ws-row:focus-within .ws-more,
+.ws-more:focus-visible { visibility: visible; }
+
+.ws-act {
+  padding: 0 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.ws-more:hover,
+.ws-act:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.ws-rename {
+  width: 100%;
+  min-width: 0;
+  padding: 0 4px;
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.ws-archived-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-tertiary);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.ws-archived-toggle::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 150ms ease;
+}
+
+.ws-archived-toggle.open::before { transform: translateY(-2px) rotate(45deg); }
+.ws-archived-toggle:hover,
+.ws-archived-toggle:focus-visible { color: var(--text-primary); background: var(--bg-hover); }
+
+.ws-count { color: var(--text-muted); }
+
+/* ---------- New workspace dialog (reuses the task-run modal shell) ---------- */
+
+.new-workspace-modal { --modal-width: 460px; }
+
+.new-workspace-modal .task-run-modal-header p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.nw-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.nw-field[hidden] { display: none; }
+
+.nw-field-label {
+  flex: none;
+  width: 84px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.nw-field .task-run-input { flex: 1; margin: 0; }
+
+.nw-select { width: 100%; margin-bottom: 8px; }
+
+.nw-prompt {
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  font-family: var(--font-sans);
+}
+
+.nw-error {
+  min-height: 16px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--error);
+}
+
+.nw-error:empty { display: none; }
+
+/* Archive dialog: the destructive choice reads as such. */
+#archive-workspace-modal .task-run-btn-primary.danger {
+  background: var(--error);
+  border-color: var(--error);
+}
+
+/* ---------- Project Settings → Workspaces ---------- */
+
+.settings-row.settings-row-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.settings-textarea,
+.settings-text-input {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+}
+
+.settings-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 56px;
+}
+
+.settings-text-input {
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: 140px;
+}
+
+.settings-textarea:focus,
+.settings-text-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.settings-textarea:disabled,
+.settings-text-input:disabled { opacity: 0.5; }
+
+#settings-workspaces-note { margin: 0 0 8px; }
+
+/* ---------- Where a spec lives (spec-in-workspace) ---------- */
+
+.ws-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 0 6px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--accent-subtle, rgba(143, 240, 174, 0.15));
+  color: var(--accent-primary);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ws-chip::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* The spec a workspace holds, under its name (spec-in-workspace). */
+.ws-spec {
+  align-self: flex-start;
+  max-width: 100%;
+  margin-top: 1px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--accent-primary);
+  font: inherit;
+  font-size: 11px;
+  line-height: 15px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ws-spec:hover { text-decoration: underline; }
+
+/* ---------- Git / PR state on a row (workspace-pr-flow) ---------- */
+
+.ws-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.ws-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.ws-badge.dirty { color: var(--warning); }
+.ws-badge.ahead { color: var(--text-secondary); }
+.ws-badge.pr { color: var(--accent-primary); }
+.ws-badge.pr.draft { color: var(--text-tertiary); }
+.ws-badge.pr.merged { color: var(--info, #a6c0f0); }
+.ws-badge.pr.closed { color: var(--text-muted); text-decoration: line-through; }
+
+.ws-checks {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.ws-checks.passing { background: var(--success); }
+.ws-checks.failing { background: var(--error); }
+.ws-checks.pending { background: var(--warning); }
+
+.workspace-context-menu .context-menu-item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ---------- Create PR dialog ---------- */
+
+.create-pr-modal { --modal-width: 620px; }
+
+.create-pr-modal .task-run-input { width: 100%; box-sizing: border-box; }
+
+.cpr-body {
+  min-height: 180px;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.cpr-draft { margin-top: 8px; }
+
+/* Update from base stopped half-way (update-from-base) */
+.ws-badge.merging { color: var(--error); font-weight: 600; }
+
+/* Conflict dialog (update-from-base) */
+.update-conflict-modal { --modal-width: 520px; }
+.uc-files {
+  margin: 0;
+  padding: 8px 12px;
+  list-style: none;
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--error);
+}
+.uc-files li + li { margin-top: 3px; }
+.uc-hint { margin: 10px 0 0; font-size: 12px; color: var(--text-tertiary); }
+
+/* ─── Frame Server (server-workspaces) ─── */
+.server-connect-modal { --modal-width: 520px; }
+.server-connect-modal .task-run-modal-header p code { font-family: var(--font-mono); font-size: 11px; }
+.server-connect-modal .task-run-input { width: 100%; box-sizing: border-box; font-family: var(--font-mono); }
+.sc-status { margin: 8px 0 0; font-size: 12px; color: var(--text-secondary); }
+.sc-status[data-state="connected"] { color: var(--success); }
+.sc-status[data-state="error"] { color: var(--error); }
+.sc-status[data-state="connecting"],
+.sc-status[data-state="reconnecting"] { color: var(--warning); }
+.sc-disconnect { margin-right: auto; }
+
+.sb-server-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-left: 6px;
+  background: var(--text-muted);
+  flex: 0 0 auto;
+}
+.sb-server[data-state="connected"] .sb-server-dot { background: var(--success); }
+.sb-server[data-state="connecting"] .sb-server-dot,
+.sb-server[data-state="reconnecting"] .sb-server-dot { background: var(--warning); }
+.sb-server[data-state="error"] .sb-server-dot { background: var(--error); }
+
+/* Server workspaces in the list (server-workspaces) */
+.ws-loc {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 15px;
+  color: var(--info, #a6c0f0);
+  vertical-align: 1px;
+}
+.ws-row.server.offline .ws-labels { opacity: 0.55; }
+.ws-row.server.offline .ws-loc { color: var(--warning); }
+.nw-location-hint { margin: 6px 0 0; font-size: 11px; color: var(--text-tertiary); }
+.ws-server-placeholder {
+  padding: 16px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+/* Server terminal while the link is down (server-workspaces) */
+.srv-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--bg-primary);
+  background: var(--warning);
+  pointer-events: none;
+}
+
+/* Editor status for a server workspace's file (server-workspace-panels) */
+#editor-status.readonly { color: var(--info, #a6c0f0); }
+
+/* Install, update and check-up in the Connect dialog (server-install-update) */
+.server-connect-modal { --modal-width: 560px; }
+.sc-panel { margin-top: 12px; display: grid; gap: 8px; }
+.sc-install-reason { margin: 0; font-size: 12px; color: var(--text-secondary); }
+.sc-progress {
+  margin: 0;
+  max-height: 160px;
+  overflow: auto;
+  padding: 8px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.sc-consent { padding: 10px 12px; border: 1px solid var(--warning); border-radius: var(--radius-sm); }
+.sc-consent p { margin: 0; font-size: 12px; color: var(--text-primary); }
+.sc-agents { margin: 0; padding-left: 18px; font-size: 12px; color: var(--text-secondary); }
+.sc-consent-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.sc-doctor-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+.sc-link { padding: 0; border: none; background: none; color: var(--text-tertiary); font-size: 11px; cursor: pointer; text-transform: none; letter-spacing: 0; }
+.sc-link:hover { color: var(--text-primary); }
+.sc-doctor-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.sc-check { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; font-size: 12px; }
+.sc-check-mark { font-weight: 700; color: var(--success); }
+.sc-check.missing .sc-check-mark { color: var(--warning); }
+.sc-check.optional .sc-check-mark { color: var(--text-muted); }
+.sc-check-label { color: var(--text-primary); }
+.sc-check-detail { color: var(--text-tertiary); }
+.sc-fix { display: flex; gap: 6px; align-items: center; margin-top: 3px; min-width: 0; }
+.sc-fix code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; padding: 3px 6px; border-radius: var(--radius-sm); background: var(--bg-tertiary); font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
+.sb-server[data-state="needs-install"] .sb-server-dot,
+.sb-server[data-state="needs-update"] .sb-server-dot,
+.sb-server[data-state="installing"] .sb-server-dot { background: var(--warning); }
+.sc-status[data-state="needs-install"],
+.sc-status[data-state="needs-update"],
+.sc-status[data-state="installing"] { color: var(--warning); }
+.sc-panel[hidden], .sc-progress[hidden], .sc-agents[hidden] { display: none; }
+.server-connect-modal .task-run-modal-footer { flex-wrap: wrap; }
+.server-connect-modal .task-run-modal-footer .task-run-btn { white-space: nowrap; }
+
+/* ─── Servers dialog: list + detail (multi-server-connections) ─── */
+/* The saved servers on the left (the project menu's row rhythm, a state dot
+   per server), the selected one's status, install and check-up on the right. */
+.server-connect-modal { --modal-width: 760px; }
+
+.sc-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .sc-body { grid-template-columns: 1fr; }
+}
+
+.sc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding-right: 16px;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.sc-servers {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 320px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.sc-servers[hidden] { display: none; }
+
+.sc-server {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.sc-server:hover { background: var(--bg-hover); color: var(--text-primary); }
+.sc-server:focus-visible { box-shadow: inset 0 0 0 1px var(--accent-primary); }
+.sc-server.on { background: var(--bg-tertiary); color: var(--text-primary); }
+
+.sc-server-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.sc-server[data-state="connected"] .sc-server-dot { background: var(--success); }
+.sc-server[data-state="connecting"] .sc-server-dot,
+.sc-server[data-state="reconnecting"] .sc-server-dot,
+.sc-server[data-state="installing"] .sc-server-dot,
+.sc-server[data-state="needs-install"] .sc-server-dot,
+.sc-server[data-state="needs-update"] .sc-server-dot { background: var(--warning); }
+.sc-server[data-state="error"] .sc-server-dot { background: var(--error); }
+
+.sc-server-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sc-server-host {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.sc-server-state {
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+}
+
+.sc-add { display: grid; gap: 6px; margin: 0; }
+
+.sc-add-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.sc-add-row { display: flex; gap: 6px; }
+.sc-add-row .task-run-input { flex: 1; min-width: 0; margin: 0; }
+.sc-add-btn { flex: none; }
+
+.sc-detail { min-width: 0; }
+
+/* `:not([hidden])`: a display rule would override the hidden attribute the dialog toggles. */
+.sc-empty:not([hidden]) { display: grid; gap: 8px; }
+
+.sc-empty p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+/* "Before you start" (server-first-connect) */
+.sc-note-title {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.sc-note-list {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.sc-empty code:not(#sc-note-command),
+.sc-note-list code { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
+.sc-note-cmd { margin-top: 0; }
+.sc-error-action { justify-self: start; margin: 2px 0 6px; }
+
+/* Connect → Install Frame Server → Check-up (server-first-connect) */
+.sc-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 6px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.sc-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+}
+.sc-step-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  font-size: 9.5px;
+  font-weight: 600;
+}
+.sc-step[data-state="active"] { color: var(--text-primary); }
+.sc-step[data-state="active"] .sc-step-mark { border-color: var(--accent-primary); color: var(--accent-primary); }
+.sc-step[data-state="done"] .sc-step-mark { border-color: var(--success); background: var(--success-subtle); color: var(--success); }
+.sc-step[data-state="attention"] { color: var(--warning-ink, var(--warning)); }
+.sc-step[data-state="attention"] .sc-step-mark { border-color: var(--warning); color: var(--warning-ink, var(--warning)); }
+.sc-step[data-state="failed"] { color: var(--error); }
+.sc-step[data-state="failed"] .sc-step-mark { border-color: var(--error); background: var(--error-subtle); color: var(--error); }
+.sc-empty p.sc-note-small { font-size: 11px; }
+
+.sc-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sc-detail-host {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sc-remove { color: var(--text-tertiary); }
+.sc-remove:hover { color: var(--error); }
+
+/* ─── Remote: one sub-header per server (multi-server-connections) ─── */
+.ws-server {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ws-server + .ws-server { margin-top: 4px; }
+
+/* A server's workspaces sit a step in under its host, so the host reads as
+   their parent: each row's dot lines up with the server icon (head: 4px
+   padding + 8px caret + 6px gap = 18px; row: 8px padding). */
+.ws-server > .ws-row { margin-left: 10px; }
+.ws-server > .ws-empty { padding-left: 18px; }
+
+/* A labelled sub-separator: host, then a hairline to the edge (and Connect
+   while the server is down). Quieter than the Local / Remote labels. */
+.ws-server-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  padding: 4px 2px 2px 4px;
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+/* Collapsible (multi-server-connections): the whole sub-header toggles; the
+   selected workspace's server is locked open, so it has no caret. */
+.ws-server-head[data-act="toggle-server"] { cursor: pointer; }
+.ws-server-head[data-act="toggle-server"]:hover .ws-server-name,
+.ws-server-head[data-act="toggle-server"]:hover .ws-server-icon,
+.ws-server-head[data-act="toggle-server"]:hover .ws-server-caret { color: var(--text-secondary); }
+.ws-server-head:focus-visible { box-shadow: inset 0 0 0 1px var(--accent-primary); }
+
+.ws-server-caret {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.ws-server-caret::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-right: 1.25px solid currentColor;
+  border-bottom: 1.25px solid currentColor;
+  transform: translateY(-1px) rotate(45deg);
+  transition: transform 150ms ease;
+}
+
+.ws-server-head.collapsed .ws-server-caret::before { transform: rotate(-45deg); }
+.ws-server-head.locked .ws-server-caret::before { visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-server-caret::before { transition: none; }
+}
+
+/* The status bar's server mark, smaller. */
+.ws-server-icon {
+  flex: none;
+  display: inline-flex;
+  color: var(--text-tertiary);
+}
+
+.ws-server-head:not(.up) .ws-server-icon { color: var(--text-muted); }
+
+.ws-server-count {
+  flex: none;
+  min-width: 14px;
+  padding-right: 4px;
+  text-align: right;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ws-server-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.ws-server-head:not(.up) .ws-server-name { color: var(--text-muted); }
+.ws-server-head.setup .ws-server-name { color: var(--warning); }
+
+.ws-server-rule {
+  flex: 1 1 16px;
+  min-width: 16px;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.ws-empty-compact { padding: 2px 8px 6px; }
+
+.ws-add-server {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 5px 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-tertiary);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.ws-add-server > span:not(.ws-new-key) { flex: 1; }
+
+.ws-add-server:hover,
+.ws-add-server:focus-visible { background: var(--bg-hover); color: var(--text-primary); }
+
+/* ─── New Workspace: Frame's own controls (multi-server-connections) ─── */
+/* Selects are drawn as the switchers' box (bg-tertiary, border, radius-md,
+   a chevron), branch fields list in the project menu's surface. */
+.new-workspace-modal .task-run-section { display: flex; flex-direction: column; gap: 6px; }
+.new-workspace-modal .task-run-segmented { margin-bottom: 2px; }
+
+.nw-select-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.nw-select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -5px;
+  border-right: 1.5px solid var(--text-tertiary);
+  border-bottom: 1.5px solid var(--text-tertiary);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.nw-select-wrap .nw-select {
+  width: 100%;
+  height: 32px;
+  margin: 0;
+  padding: 0 32px 0 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.nw-select-wrap .nw-select:hover { background: var(--bg-elevated); border-color: var(--border-strong); }
+.nw-select-wrap .nw-select:focus { outline: none; border-color: var(--accent-primary); }
+
+.nw-hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-tertiary);
+}
+
+.nw-hint:empty { display: none; }
+
+.nw-combo {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.nw-combo .task-run-input {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.nw-combo-list {
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  width: auto;
+  max-width: none;
+  max-height: 240px;
+  z-index: 20;
+  gap: 1px;
+}
+
+.nw-combo-section {
+  padding: 6px 8px 2px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  user-select: none;
+}
+
+.nw-combo-item {
+  padding: 6px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.nw-combo-item.highlight {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* "New workspace…" leads the menu, like the project menu's "Add a project…". */
+.ws-new-key {
+  flex: none;
+  margin-left: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+/* Scoped under .ws-menu: menu.css (imported after this file) sets every
+   .sidebar-project-menu-item to 13px, which beat a bare .ws-new. Same size
+   and height as "Add server…". */
+.ws-menu .ws-new { height: 28px; padding: 0 8px; line-height: 28px; font-size: 11px; font-weight: 400; }
+.ws-new:disabled { opacity: 0.45; cursor: default; }
+.ws-new:disabled:hover { background: transparent; color: var(--text-tertiary); }

@@ -19,6 +19,7 @@
 
 /* 5. Panels (History, Tasks, Plugins, GitHub, Overview, Structure Map) */
 @import 'components/panels.css';
+@import 'components/send-files-modal.css';
 
 /* Shared header of the full-page surfaces (Specs, Tasks, Sessions, Orchestration) */
 @import 'components/view-header.css';
@@ -85,6 +86,7 @@
 
 /* 15. Diff Viewer Overlay (read-only) */
 @import 'components/diff-viewer.css';
+@import 'components/review.css';
 
 /* 16. Lane Board (Lane Orchestrator home screen) */
 @import 'components/home-board.css';
@@ -97,6 +99,7 @@
 
 /* 18. Projects Section (pinned project switcher + Open Project modal) */
 @import 'components/project-section.css';
+@import 'components/workspaces.css';
 
 /* Activity panel + right rail */
 @import 'components/activity.css';

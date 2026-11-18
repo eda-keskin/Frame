@@ -38,7 +38,28 @@ const STEPS = [
     id: 'switcher',
     title: 'Your projects',
     body: 'This is the project you are in. Open it to switch to another project or add a new one.',
-    targets: [{ selector: '#sidebar-current-project-wrap', placement: 'bottom' }],
+    targets: [{ selector: '#sidebar-current-project-wrap', placement: 'right' }],
+    advance: 'next',
+    requiresProject: true,
+    requiresNoProject: false
+  },
+  {
+    id: 'workspaces',
+    title: 'Workspaces',
+    body: 'Under the project, pick where you work: main, or a workspace with its own branch and folder, on this Mac or on a server. New workspace at the top of this list creates one.',
+    targets: [{ selector: '#workspace-section .ws-switch', placement: 'right' }],
+    advance: 'next',
+    requiresProject: true,
+    requiresNoProject: false
+  },
+  {
+    id: 'servers',
+    title: 'Your own servers',
+    body: 'Add a machine of yours over SSH and its workspaces keep running while this Mac is away. Add as many as you like; each gets its own section under Remote.',
+    targets: [
+      { selector: '#add-server-btn', placement: 'right' },
+      { selector: '#status-bar .sb-server', placement: 'top' }
+    ],
     advance: 'next',
     requiresProject: true,
     requiresNoProject: false
@@ -58,7 +79,7 @@ const STEPS = [
     body: 'Frame is terminal-first: you drive the work by talking to your agent in its terminal, as you would anywhere else. Terminals shows them all, and each terminal gets a chip whose dot tells you when the agent needs you.',
     targets: [
       { selector: '.lane-bar-terminals', placement: 'bottom' },
-      { selector: '.workspace-nav-item[data-view="terminals"]', placement: 'right', needsNav: 'terminals' }
+      { selector: '.project-nav-item[data-view="terminals"]', placement: 'right', needsNav: 'terminals' }
     ],
     advance: 'next',
     requiresProject: true,
@@ -68,7 +89,7 @@ const STEPS = [
     id: 'specs',
     title: 'Specs for bigger work',
     body: 'Sizable work goes spec, plan, tasks before any code. Each step\'s button hands the prompt to your agent in a terminal, and every step leaves a file in the project.',
-    targets: [{ selector: '.workspace-nav-item[data-view="specs"]', placement: 'right', needsNav: 'specs' }],
+    targets: [{ selector: '.project-nav-item[data-view="specs"]', placement: 'right', needsNav: 'specs' }],
     advance: 'next',
     requiresProject: true,
     requiresNoProject: false
@@ -77,7 +98,7 @@ const STEPS = [
     id: 'tasks',
     title: 'Tasks',
     body: 'Your own tasks, in progress above pending, with what is done one click away. The play button on a pending task sends it to an agent terminal; the tasks a spec generates stay hidden until you show them.',
-    targets: [{ selector: '.workspace-nav-item[data-view="tasks"]', placement: 'right', needsNav: 'tasks' }],
+    targets: [{ selector: '.project-nav-item[data-view="tasks"]', placement: 'right', needsNav: 'tasks' }],
     advance: 'next',
     requiresProject: true,
     requiresNoProject: false

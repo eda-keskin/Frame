@@ -103,7 +103,7 @@
       </div>
     </div>
 
-    <span class="app-loader-sr">Loading workspace…</span>
+    <span class="app-loader-sr">Loading projects…</span>
   </div>
 
   <!-- App header: one row across the whole window, above the sidebar and
@@ -111,8 +111,8 @@
        markup on purpose — it exists before any script runs, so nothing in
        it flashes at boot and every module that binds by id finds its
        element at DOMContentLoaded. Left: Frame's mark. Right: the
-       project and agent pickers with Start, the window-level controls and
-       the layout toggles. appHeader.js wires the behavior. -->
+       agent picker with Start, the window-level controls and the layout
+       toggles. appHeader.js wires the behavior. -->
   <header id="app-header">
     <div class="app-header-left">
       <!-- Frame's mark (assets/frame-mark.svg): the four corner brackets that
@@ -241,7 +241,14 @@
              .sidebar-tab-btn (that class drives view switching).
              .sidebar-rail-btn-foot on the first pushes the group to the
              bottom. -->
-        <button id="plugins-btn" class="sidebar-rail-btn sidebar-rail-btn-foot" aria-label="Plugins" tabindex="-1">
+        <!-- Add Server: opens the Servers dialog on its add field
+             (serverConnect.open({ add: true }), like File ▸ Add Server…). -->
+        <button id="add-server-btn" class="sidebar-rail-btn sidebar-rail-btn-foot" aria-label="Add Server" tabindex="-1">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/>
+          </svg>
+        </button>
+        <button id="plugins-btn" class="sidebar-rail-btn" aria-label="Plugins" tabindex="-1">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>
           </svg>
@@ -253,7 +260,7 @@
         </button>
         <!-- Frame's own settings: privacy and About/updates. The gear is the
              app-preferences mark everywhere else; the project's settings are
-             a row under the project in the workspace nav. -->
+             a row in the project nav. -->
         <button id="frame-settings-btn" class="sidebar-rail-btn" aria-label="Frame Settings" tabindex="-1">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
@@ -270,9 +277,11 @@
 
       <div class="sidebar-panel">
         <!-- Current-project switcher: the one project selector, at the top of
-             the sidebar panel on every tab (moved out of the app header on
-             2026-11-18, the user). Taller than the controls under it so it
-             reads as the panel's heading. index.js binds it by id. -->
+             the panel above Work (and above whatever view the rail picked), so
+             everything below it reads as "this project's". Moved back from
+             the app header on 2026-10-22 at the user's request, overturning
+             shell-chrome-app-header-collapsible-panels D1: with the sidebar
+             collapsed (⌘B) it is out of sight. index.js binds it by id. -->
         <div id="sidebar-current-project-wrap" class="sidebar-current-project-wrap">
           <button id="sidebar-current-project" class="sidebar-current-project" tabindex="-1" title="Switch project" aria-haspopup="true" aria-expanded="false">
             <span class="sidebar-current-project-label">Project</span>
@@ -283,7 +292,13 @@
           </button>
           <div id="sidebar-project-menu" class="sidebar-project-menu" role="menu" hidden></div>
         </div>
-        <!-- Projects view (default) — the workspace panel for the selected
+        <!-- Workspace switcher (workspaces spec): the second level under the
+             project — main + this project's workspaces as a collapsible list, grouped
+             Local / Remote. Sits on every rail view, like the project
+             switcher, because the selection re-points files, git and
+             terminals everywhere. workspaceSection.js renders it. -->
+        <div id="workspace-section" class="workspace-section project-nav-group" hidden></div>
+        <!-- Projects view (default) — the project panel for the selected
              project (project-dropdown spec): selection lives in the
              current-project switcher above, which also carries "+ Add a
              project…". The pinned "Add new Project" CTA was removed on
@@ -291,7 +306,8 @@
              Home carries the three ways in, so the button was a third answer
              to a question already answered twice. -->
         <div class="sidebar-tab-content sidebar-view-projects" data-sidebar-tab-content="projects">
-          <div id="workspace-panel" class="workspace-panel"></div>
+          <div id="project-panel" class="project-panel">
+          </div>
         </div>
 
         <!-- Files view -->
@@ -1377,6 +1393,235 @@
     </div>
   </div>
 
+  <!-- New workspace (workspaces spec): branch + worktree, then setup, then the agent -->
+  <div id="new-workspace-modal" class="task-run-modal new-workspace-modal" role="dialog" aria-modal="true" aria-labelledby="nw-title">
+    <div class="task-run-modal-container">
+      <div class="task-run-modal-header">
+        <h3 id="nw-title">New workspace</h3>
+        <p>A branch in its own worktree, outside the repo. Your main checkout is untouched.</p>
+      </div>
+      <div class="task-run-modal-body">
+        <!-- Where it runs first: the dialog opens from Local or Remote, and
+             the rest of the form reads in that context. -->
+        <div class="task-run-section" id="nw-location-row" hidden>
+          <label for="nw-location" class="task-run-section-label">Location</label>
+          <div class="nw-select-wrap"><select id="nw-location" class="nw-select"></select></div>
+          <p class="nw-hint" id="nw-location-hint"></p>
+        </div>
+        <div class="task-run-section">
+          <span class="task-run-section-label" id="nw-from-label">Start from</span>
+          <div class="task-run-segmented" role="radiogroup" aria-labelledby="nw-from-label">
+            <label class="task-run-segment">
+              <input type="radio" name="nw-from" value="new" checked>
+              <span>New branch</span>
+            </label>
+            <label class="task-run-segment">
+              <input type="radio" name="nw-from" value="branch">
+              <span>Existing branch</span>
+            </label>
+          </div>
+          <!-- Branch fields: Frame's own filterable list (branchOptions), not
+               the browser's datalist. -->
+          <div id="nw-branch-row" class="nw-field" hidden>
+            <label for="nw-branch" class="nw-field-label">Branch</label>
+            <div class="nw-combo" data-combo="branch">
+              <input type="text" id="nw-branch" class="task-run-input" placeholder="Search branches…" spellcheck="false" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="nw-branch-list">
+              <div id="nw-branch-list" class="sidebar-project-menu nw-combo-list" role="listbox" hidden></div>
+            </div>
+          </div>
+          <div id="nw-base-row" class="nw-field">
+            <label for="nw-base" class="nw-field-label" id="nw-base-label">Branch from</label>
+            <div class="nw-combo" data-combo="base">
+              <input type="text" id="nw-base" class="task-run-input" placeholder="main" spellcheck="false" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="nw-base-list">
+              <div id="nw-base-list" class="sidebar-project-menu nw-combo-list" role="listbox" hidden></div>
+            </div>
+          </div>
+          <p class="nw-hint" id="nw-from-hint"></p>
+        </div>
+        <div class="task-run-section">
+          <label for="nw-tool" class="task-run-section-label">Agent</label>
+          <div class="nw-select-wrap"><select id="nw-tool" class="nw-select"></select></div>
+          <textarea id="nw-prompt" class="task-run-input nw-prompt" rows="3" placeholder="Optional first prompt — ⌘↩ to create"></textarea>
+        </div>
+        <p id="nw-error" class="nw-error" role="alert"></p>
+      </div>
+      <div class="task-run-modal-footer">
+        <button type="button" id="nw-cancel" class="task-run-btn task-run-btn-cancel">Cancel</button>
+        <button type="button" id="nw-create" class="task-run-btn task-run-btn-primary">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create a pull request from a workspace (workspace-pr-flow): Frame prefills, the user edits -->
+  <div id="create-pr-modal" class="task-run-modal new-workspace-modal create-pr-modal" role="dialog" aria-modal="true" aria-labelledby="cpr-title-h">
+    <div class="task-run-modal-container">
+      <div class="task-run-modal-header">
+        <h3 id="cpr-title-h">Create pull request</h3>
+        <p id="cpr-summary"></p>
+      </div>
+      <div class="task-run-modal-body">
+        <div class="task-run-section">
+          <label for="cpr-title" class="task-run-section-label">Title</label>
+          <input type="text" id="cpr-title" class="task-run-input" spellcheck="true">
+        </div>
+        <div class="task-run-section">
+          <label for="cpr-body" class="task-run-section-label">Description</label>
+          <textarea id="cpr-body" class="task-run-input cpr-body" rows="10" spellcheck="true"></textarea>
+          <label class="task-run-radio cpr-draft"><input type="checkbox" id="cpr-draft"><span>Open as draft</span></label>
+        </div>
+        <p id="cpr-error" class="nw-error" role="alert"></p>
+      </div>
+      <div class="task-run-modal-footer">
+        <button type="button" id="cpr-cancel" class="task-run-btn task-run-btn-cancel">Cancel</button>
+        <button type="button" id="cpr-create" class="task-run-btn task-run-btn-primary">Create pull request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Frame Servers over SSH (server-workspaces; multi-server-connections):
+       the saved servers on the left with an add form, the selected server's
+       status, install / update and check-up on the right. The footer acts on
+       the selected server. -->
+  <div id="server-connect-modal" class="task-run-modal new-workspace-modal server-connect-modal" role="dialog" aria-modal="true" aria-labelledby="sc-title">
+    <div class="task-run-modal-container">
+      <div class="task-run-modal-header">
+        <h3 id="sc-title">Servers</h3>
+        <p>Run workspaces on your own machines. Frame connects with your <code>ssh</code> — keys, agent and ~/.ssh/config apply — and needs Frame Server running there. Every server stays connected on its own.</p>
+      </div>
+      <div class="task-run-modal-body sc-body">
+        <aside class="sc-list" aria-label="Saved servers">
+          <ul id="sc-servers" class="sc-servers" role="listbox" aria-label="Servers"></ul>
+          <form id="sc-add-form" class="sc-add" autocomplete="off">
+            <label for="sc-host" class="sc-add-label">Add a server</label>
+            <div class="sc-add-row">
+              <input type="text" id="sc-host" class="task-run-input" list="sc-hosts" placeholder="myserver or me@host" spellcheck="false" autocomplete="off">
+              <button type="submit" id="sc-add" class="task-run-btn task-run-btn-primary sc-add-btn">Add</button>
+            </div>
+            <datalist id="sc-hosts"></datalist>
+            <p id="sc-add-error" class="nw-error" role="alert"></p>
+          </form>
+        </aside>
+        <section class="sc-detail" aria-live="polite">
+          <div id="sc-empty" class="sc-empty" hidden>
+            <h4 class="sc-note-title">Before you start</h4>
+            <p>Workspaces can run on a Linux or macOS machine you reach with <code>ssh</code> from this Mac — a Linux box, a GPU machine, a second dev server. Frame signs in with your SSH key, never a password.</p>
+            <ul class="sc-note-list">
+              <li><b>What to type:</b> a Host from <code>~/.ssh/config</code> (suggested as you type), or <code>user@address</code>.</li>
+              <li><b>No key login yet?</b> Run this in a terminal on this Mac, with your server in place of <code>user@host</code>. It creates a key if this Mac has none and copies it to the server, asking for the password once:</li>
+            </ul>
+            <div class="sc-fix sc-note-cmd"><code id="sc-note-command"></code><button type="button" id="sc-note-copy" class="sc-link">Copy</button></div>
+            <p class="sc-note-small">A key with a passphrase has to be in your agent or Keychain (<code>ssh-add --apple-use-keychain ~/.ssh/id_ed25519</code>) — Frame never asks for it.</p>
+          </div>
+          <div id="sc-detail-body">
+            <div class="sc-detail-head">
+              <span id="sc-detail-host" class="sc-detail-host"></span>
+              <button type="button" id="sc-remove" class="sc-link sc-remove">Remove</button>
+            </div>
+            <ol id="sc-steps" class="sc-steps" aria-label="Setup steps"></ol>
+            <p id="sc-status" class="sc-status" data-state="off"></p>
+            <p id="sc-error" class="nw-error" role="alert"></p>
+            <button type="button" id="sc-error-action" class="task-run-btn task-run-btn-primary sc-error-action" hidden>Set up access in a terminal</button>
+            <!-- Install / update (server-install-update) -->
+            <div id="sc-install" class="sc-panel" hidden>
+              <p id="sc-install-reason" class="sc-install-reason"></p>
+              <pre id="sc-progress" class="sc-progress" hidden></pre>
+            </div>
+            <div id="sc-consent" class="sc-panel sc-consent" hidden>
+              <p id="sc-consent-text"></p>
+              <ul id="sc-agents" class="sc-agents"></ul>
+              <div class="sc-consent-actions">
+                <button type="button" id="sc-later" class="task-run-btn task-run-btn-cancel">Later</button>
+                <button type="button" id="sc-confirm" class="task-run-btn task-run-btn-primary">Update now</button>
+              </div>
+            </div>
+            <div id="sc-doctor" class="sc-panel" hidden>
+              <div class="sc-doctor-head"><span>Server check-up</span><span><button type="button" id="sc-open-terminal" class="sc-link">Open terminal on server</button> <button type="button" id="sc-recheck" class="sc-link">Check again</button></span></div>
+              <ul id="sc-doctor-list" class="sc-doctor-list"></ul>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="task-run-modal-footer">
+        <button type="button" id="sc-disconnect" class="task-run-btn task-run-btn-cancel sc-disconnect" hidden>Disconnect</button>
+        <button type="button" id="sc-rollback" class="task-run-btn task-run-btn-cancel" hidden>Roll back</button>
+        <button type="button" id="sc-cancel" class="task-run-btn task-run-btn-cancel">Close</button>
+        <button type="button" id="sc-install-btn" class="task-run-btn task-run-btn-primary" hidden>Install Frame Server</button>
+        <button type="button" id="sc-connect" class="task-run-btn task-run-btn-primary">Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="update-conflict-modal" class="task-run-modal new-workspace-modal update-conflict-modal" role="dialog" aria-modal="true" aria-labelledby="uc-title">
+    <div class="task-run-modal-container">
+      <div class="task-run-modal-header">
+        <h3 id="uc-title">Update stopped on conflicts</h3>
+        <p id="uc-summary"></p>
+      </div>
+      <div class="task-run-modal-body">
+        <ul id="uc-files" class="uc-files"></ul>
+        <p class="uc-hint">Hand them to an agent in this workspace, or abort to put the branch back where it was. You can also decide later from the workspace's menu.</p>
+      </div>
+      <div class="task-run-modal-footer">
+        <button type="button" id="uc-later" class="task-run-btn task-run-btn-cancel">Later</button>
+        <button type="button" id="uc-abort" class="task-run-btn task-run-btn-cancel">Abort update</button>
+        <button type="button" id="uc-resolve" class="task-run-btn task-run-btn-primary">Resolve with agent</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Archive a workspace with uncommitted changes (workspaces spec): never auto-commits -->
+  <div id="archive-rescue-modal" class="task-run-modal new-workspace-modal" role="dialog" aria-modal="true" aria-labelledby="ar-title">
+    <div class="task-run-modal-container">
+      <div class="task-run-modal-header">
+        <h3 id="ar-title">Commits not on any branch</h3>
+        <p id="ar-summary"></p>
+      </div>
+      <div class="task-run-modal-body">
+        <div class="task-run-section">
+          <p class="task-run-hint">Removing the folder would lose them. Frame can keep them on a new branch first:</p>
+          <p><code id="ar-branch"></code></p>
+        </div>
+      </div>
+      <div class="task-run-modal-footer">
+        <button type="button" id="ar-cancel" class="task-run-btn task-run-btn-cancel">Cancel</button>
+        <button type="button" id="ar-confirm" class="task-run-btn task-run-btn-primary">Keep them and archive</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="archive-workspace-modal" class="task-run-modal new-workspace-modal" role="dialog" aria-modal="true" aria-labelledby="aw-title">
+    <div class="task-run-modal-container">
+      <div class="task-run-modal-header">
+        <h3 id="aw-title">Archive workspace</h3>
+        <p id="aw-summary"></p>
+      </div>
+      <div class="task-run-modal-body">
+        <div class="task-run-section">
+          <div class="task-run-radio-list" role="radiogroup" aria-label="Uncommitted changes">
+            <label class="task-run-radio">
+              <input type="radio" name="aw-action" value="commit" checked>
+              <span>Commit them to the branch</span>
+            </label>
+            <label class="task-run-radio">
+              <input type="radio" name="aw-action" value="discard">
+              <span>Discard them</span>
+            </label>
+          </div>
+          <div id="aw-message-row" class="nw-field">
+            <label for="aw-message" class="nw-field-label">Message</label>
+            <input type="text" id="aw-message" class="task-run-input" spellcheck="false">
+          </div>
+          <p class="task-run-hint">The folder is removed; the branch stays and the workspace can be restored.</p>
+        </div>
+        <p id="aw-error" class="nw-error" role="alert"></p>
+      </div>
+      <div class="task-run-modal-footer">
+        <button type="button" id="aw-cancel" class="task-run-btn task-run-btn-cancel">Cancel</button>
+        <button type="button" id="aw-confirm" class="task-run-btn task-run-btn-primary">Archive</button>
+      </div>
+    </div>
+  </div>
+
   <!-- File Tree Context Menu -->
   <div id="file-tree-context-menu" class="context-menu" role="menu">
     <button class="context-menu-item" data-action="reveal" type="button">Reveal in Finder</button>
@@ -1533,6 +1778,64 @@
             </select>
           </div>
         </div>
+
+        <!-- Workspaces (workspaces spec): what every new workspace gets. Saved
+             in .frame/config.json → settings.workspaces, so a team sharing the
+             repo shares the setup. -->
+        <div class="settings-section" id="settings-workspaces-section">
+          <h4 class="settings-section-title">Workspaces</h4>
+          <p class="settings-row-desc" id="settings-workspaces-note" style="display:none;"></p>
+          <div class="settings-row settings-row-stacked">
+            <div class="settings-row-text">
+              <label class="settings-row-label" for="settings-ws-setup">Setup script</label>
+              <p class="settings-row-desc">
+                Runs in a <em>setup</em> terminal inside each new or restored workspace, before the
+                agent starts — usually installing dependencies, e.g. <code>npm install</code>.
+              </p>
+            </div>
+            <textarea id="settings-ws-setup" class="settings-textarea" rows="3" spellcheck="false" placeholder="npm install"></textarea>
+          </div>
+          <div class="settings-row settings-row-stacked">
+            <div class="settings-row-text">
+              <label class="settings-row-label" for="settings-ws-copy">Files to copy</label>
+              <p class="settings-row-desc">
+                Gitignored files copied from the main checkout into each workspace, one pattern per
+                line (<code>.env*</code>, <code>config/local.json</code>, <code>certs/**</code>).
+                <code>node_modules</code> is never copied.
+              </p>
+            </div>
+            <textarea id="settings-ws-copy" class="settings-textarea" rows="3" spellcheck="false" placeholder=".env*"></textarea>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-text">
+              <label class="settings-row-label" for="settings-ws-prefix">Branch prefix</label>
+              <p class="settings-row-desc">New workspace branches are named <code>&lt;prefix&gt;/&lt;color&gt;</code>.</p>
+            </div>
+            <input type="text" id="settings-ws-prefix" class="settings-text-input" spellcheck="false" placeholder="ws">
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-text">
+              <label class="settings-row-label" for="settings-ws-merge-method">Merge method</label>
+              <p class="settings-row-desc">How Frame merges a workspace's pull request. <em>Repository default</em> uses the first one the repository allows: squash, merge, then rebase.</p>
+            </div>
+            <select class="settings-select" id="settings-ws-merge-method">
+              <option value="">Repository default</option>
+              <option value="squash">Squash</option>
+              <option value="merge">Merge commit</option>
+              <option value="rebase">Rebase</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-text">
+              <label class="settings-row-label" for="settings-ws-archive-on-merge">Archive after merge</label>
+              <p class="settings-row-desc">Archive the workspace once its pull request is merged. The branch is kept and the workspace can be restored.</p>
+            </div>
+            <label class="settings-switch">
+              <input type="checkbox" id="settings-ws-archive-on-merge" />
+              <span class="settings-switch-slider"></span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1566,8 +1869,10 @@
         </div>
 
         <div class="settings-section">
-          <h4 class="settings-section-title">Privacy &amp; Analytics</h4>
-          <div class="settings-row">
+          <!-- While the analytics UI is hidden (src/shared/analyticsUi.js) the
+               two analytics rows are hidden and the title reads "Privacy". -->
+          <h4 class="settings-section-title" id="settings-privacy-title">Privacy &amp; Analytics</h4>
+          <div class="settings-row" id="settings-analytics-row">
             <div class="settings-row-text">
               <label class="settings-row-label" for="settings-analytics-toggle">Send anonymous usage stats</label>
               <p class="settings-row-desc">
@@ -1581,7 +1886,7 @@
               <span class="settings-switch-slider"></span>
             </label>
           </div>
-          <div class="settings-row">
+          <div class="settings-row" id="settings-error-reporting-row">
             <div class="settings-row-text">
               <label class="settings-row-label" for="settings-error-reporting-toggle">Send error reports</label>
               <p class="settings-row-desc">

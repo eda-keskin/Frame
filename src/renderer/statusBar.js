@@ -46,7 +46,7 @@ const { formatShortcut } = require('./platform');
 const { escapeHtml } = require('./htmlUtils');
 const tooltip = require('./tooltip');
 const uiZoom = require('../shared/uiZoom');
-const { GitBranch, Bot } = require('lucide');
+const { GitBranch, Bot, Server } = require('lucide');
 const branchPicker = require('./statusBar/branchPicker');
 const noticeTray = require('./statusBar/noticeTray');
 const githubPanel = require('./githubPanel');
@@ -94,6 +94,7 @@ function init() {
   ipcRenderer.on(IPC.CLAUDE_USAGE_DATA, (event, data) => updateUsage(data));
   ipcRenderer.send(IPC.LOAD_CLAUDE_USAGE);
 
+  _buildServer();
   _buildBranch();
   _buildDockIcons();
   _buildAgentSlot();
@@ -166,6 +167,49 @@ function _buildNoticeTray() {
 
 // ─── The left slot, first: the current git branch ───────────
 
+// ─── The left slot, first of all: the Frame Server links ────
+// server-workspaces; multi-server-connections. Shown once a server is saved.
+// One server: its host and state dot. Several: "connected / total servers"
+// with the worst state's dot (serverConnectModel.summary — a server the user
+// disconnected does not grey it while another is connected), and the tooltip
+// lists each server. A click opens the Servers dialog. With no server saved,
+// it offers "Add server", which opens the dialog on the add field.
+
+function _buildServer() {
+  const slot = barEl.querySelector('.status-bar-left');
+  if (!slot) return;
+  const serverConnect = require('./serverConnect');
+  const { summary } = require('./serverConnectModel');
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'sb-branch sb-server';
+  btn.hidden = true;
+  btn.addEventListener('click', () => serverConnect.open({ add: !serverConnect.getServers().length }));
+  slot.appendChild(btn);
+  const paint = () => {
+    const list = serverConnect.getServers();
+    const sum = summary(list);
+    btn.hidden = false;
+    if (!sum) {
+      delete btn.dataset.state;
+      btn.innerHTML = `${dock.lucideIcon(Server, 16)}<span class="sb-branch-name">Add server</span>`;
+      btn.title = 'Add a Frame Server (⌘⌥N)';
+      return;
+    }
+    btn.dataset.state = sum.state;
+    const one = list.length === 1 ? list[0] : null;
+    const label = one ? one.host : `${sum.connected}/${sum.total} servers`;
+    btn.innerHTML = `${dock.lucideIcon(Server, 16)}<span class="sb-branch-name">${escapeHtml(label)}</span><span class="sb-server-dot" aria-hidden="true"></span>`;
+    const line = (srv) => {
+      const st = srv.status || {};
+      return `${srv.host} · ${serverConnect.LABELS[st.state] || st.state || 'Not connected'}${st.error && st.state !== 'connected' ? ` — ${st.error}` : ''}`;
+    };
+    btn.title = list.map(line).join('\n');
+  };
+  serverConnect.onServersChange(paint);
+  paint();
+}
+
 function _buildBranch() {
   const slot = barEl.querySelector('.status-bar-left');
   if (!slot) return;
@@ -197,13 +241,20 @@ function _buildBranch() {
   // one on screen, so a late push from the previous project cannot label
   // this one with its branch.
   ipcRenderer.on(IPC.GIT_STATUS_DATA, (event, payload) => {
-    if (!payload || payload.projectPath !== state.getProjectPath()) return;
+    // Main watches the selected workspace's folder, so that is what a push
+    // is for — compare against the workspace root, not the project path.
+    if (!payload || payload.projectPath !== state.getWorkspaceRoot()) return;
     _renderBranch(payload.isRepo ? payload.branch : null);
   });
   // Between projects the old name must not linger until the next push, and
   // the picker (its own onProjectChange closes it too) must not show the
   // previous repo's list.
   state.onProjectChange(() => {
+    branchPicker.close();
+    _renderBranch(null);
+  });
+  // Same between workspaces: each has its own branch.
+  state.onWorkspaceChange(() => {
     branchPicker.close();
     _renderBranch(null);
   });

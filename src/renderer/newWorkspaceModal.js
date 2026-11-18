@@ -1,0 +1,476 @@
+/**
+ * New Workspace Modal (workspaces spec, T08).
+ *
+ * Asks little, the way Conductor does: where the work starts (a new branch
+ * off a base, or an existing branch), which base, which AI tool, and an
+ * optional first prompt. Enter creates.
+ *
+ * After main has created the worktree, the workspace is selected and:
+ *   - with a setup script: a "setup" terminal runs it in the worktree; when
+ *     that terminal's foreground job returns to the shell (laneStatus
+ *     running → idle), the AI terminal opens — so the agent starts with
+ *     dependencies installed;
+ *   - without one: the AI terminal opens directly.
+ * The setup tab stays open for reading and rerunning.
+ *
+ * `runSetupThenAgent` is also used after a restore (the folder, and so its
+ * dependencies, came back empty).
+ */
+
+const { ipcRenderer } = require('electron');
+const { enterSubmits } = require('./modalKeys');
+const { scopeGuard } = require('./scopeGuard');
+const { IPC } = require('../shared/ipcChannels');
+const state = require('./state');
+const notify = require('./notify');
+const laneStatus = require('./laneStatus');
+const { escapeHtml } = require('./htmlUtils');
+const branchOptions = require('./workspaces/branchOptions');
+
+const SETUP_TERMINAL_NAME = 'setup';
+const SETTLE_MS = 800;              // a fresh shell's beat before typing (agentDispatch does the same)
+const SETUP_START_GRACE_MS = 5000;  // a setup that never shows as running is treated as done
+
+let modalEl = null;
+let busy = false;
+let defaultBase = null;
+let branchNames = { local: [], remote: [] };
+
+function init() {
+  modalEl = document.getElementById('new-workspace-modal');
+  if (!modalEl) {
+    console.error('newWorkspaceModal: #new-workspace-modal not found');
+    return;
+  }
+  modalEl.addEventListener('mousedown', (e) => { if (e.target === modalEl) close(); });
+  modalEl.querySelector('#nw-cancel').addEventListener('click', close);
+  modalEl.querySelector('#nw-create').addEventListener('click', submit);
+  modalEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    // Enter creates from a field — a focused button (Cancel) handles Enter
+    // itself, and the prompt takes a newline unless ⌘/Ctrl is held (R1).
+    if (e.key === 'Enter' && enterSubmits(e.target, e)) {
+      e.preventDefault();
+      submit();
+    }
+  });
+  modalEl.querySelectorAll('input[name="nw-from"]').forEach((r) => r.addEventListener('change', syncFrom));
+  // An existing branch gets a real base too (workspace-hardening L4): prefill
+  // it from the branch's upstream, else the default branch, until the user
+  // types their own.
+  modalEl.querySelector('#nw-branch').addEventListener('change', prefillBaseForBranch);
+  modalEl.querySelector('#nw-base').addEventListener('input', (e) => { e.target.dataset.touched = '1'; paintFromHint(); });
+  modalEl.querySelector('#nw-base').addEventListener('change', paintFromHint);
+  attachCombo(modalEl.querySelector('#nw-branch'), modalEl.querySelector('#nw-branch-list'));
+  attachCombo(modalEl.querySelector('#nw-base'), modalEl.querySelector('#nw-base-list'));
+}
+
+// ─── Branch fields: Frame's own filterable list ──────────────
+//
+// The browser's datalist drew an unstyled native popup and matched only how
+// the platform chose to. This list is the project menu's surface, Local and
+// Remote sections, and matches anywhere in the name (branchOptions). Arrows
+// walk it, Enter or a click picks, Escape closes the list (not the dialog).
+
+function attachCombo(input, list) {
+  let items = [];
+  let highlight = -1;
+  const isOpen = () => !list.hidden;
+  const close = () => {
+    list.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+  };
+  const paint = () => {
+    const filter = input.dataset.filtering ? input.value : '';
+    const { sections } = branchOptions.build({ local: branchNames.local, remote: branchNames.remote, filter });
+    items = sections.flatMap((s) => s.items);
+    if (!items.length) {
+      list.innerHTML = `<div class="sidebar-project-menu-empty">${branchNames.local.length || branchNames.remote.length ? 'No branch matches' : 'Loading branches…'}</div>`;
+    } else {
+      let i = 0;
+      list.innerHTML = sections.map((s) => `
+        <div class="nw-combo-section">${escapeHtml(s.label)}</div>
+        ${s.items.map((name) => {
+          const idx = i++;
+          const on = name === input.value.trim();
+          return `<div class="sidebar-project-menu-item nw-combo-item${idx === highlight ? ' highlight' : ''}${on ? ' active' : ''}" role="option" id="${list.id}-${idx}" data-index="${idx}" aria-selected="${idx === highlight}"><span class="sidebar-project-menu-item-name">${escapeHtml(name)}</span></div>`;
+        }).join('')}
+        ${s.more ? `<div class="sidebar-project-menu-empty">${s.more} more — keep typing</div>` : ''}`).join('');
+    }
+    if (highlight >= 0) {
+      input.setAttribute('aria-activedescendant', `${list.id}-${highlight}`);
+      const el = list.querySelector(`[data-index="${highlight}"]`);
+      if (el) el.scrollIntoView({ block: 'nearest' });
+    } else {
+      input.removeAttribute('aria-activedescendant');
+    }
+  };
+  const open = () => {
+    list.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+    paint();
+  };
+  const pick = (name) => {
+    input.value = name;
+    delete input.dataset.filtering;
+    close();
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+  // Focus shows every branch (the current value marked); typing filters.
+  input.addEventListener('focus', () => {
+    delete input.dataset.filtering;
+    highlight = -1;
+    if (input.dataset.quiet) { delete input.dataset.quiet; return; } // the dialog's own focus: list stays shut
+    open();
+  });
+  input.addEventListener('click', () => { if (!isOpen()) open(); });
+  input.addEventListener('input', () => {
+    input.dataset.filtering = '1';
+    const filtered = branchOptions.build({ local: branchNames.local, remote: branchNames.remote, filter: input.value }).items;
+    highlight = branchOptions.initialHighlight(filtered, input.value);
+    open();
+  });
+  input.addEventListener('blur', () => setTimeout(close, 0));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!isOpen()) open();
+      highlight = branchOptions.move(items, highlight, e.key === 'ArrowDown' ? 1 : -1);
+      paint();
+    } else if (e.key === 'Enter' && isOpen() && highlight >= 0 && items[highlight]) {
+      e.preventDefault();
+      e.stopPropagation(); // a pick, not a submit
+      pick(items[highlight]);
+    } else if (e.key === 'Escape' && isOpen()) {
+      e.preventDefault();
+      e.stopPropagation(); // close the list, keep the dialog
+      close();
+    } else if (e.key === 'Tab') {
+      close();
+    }
+  });
+  // mousedown keeps the focus in the input, so blur does not close first.
+  list.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    const row = e.target.closest('[data-index]');
+    if (row) pick(items[Number(row.dataset.index)]);
+  });
+}
+
+/**
+ * What the base means for the chosen start (workspace-hardening L4): a new
+ * branch is cut from it; an existing branch keeps it as the branch its pull
+ * request targets and Update from base pulls from.
+ */
+function paintFromHint() {
+  const from = modalEl.querySelector('input[name="nw-from"]:checked').value;
+  const base = modalEl.querySelector('#nw-base').value.trim() || defaultBase || 'the default branch';
+  modalEl.querySelector('#nw-base-label').textContent = from === 'new' ? 'Branch from' : 'Merges into';
+  modalEl.querySelector('#nw-from-hint').textContent = from === 'new'
+    ? `A new branch is created from origin/${base}, fetched first.`
+    : `The workspace opens this branch. Its pull request targets ${base}, and Update from base pulls from it.`;
+}
+
+async function prefillBaseForBranch() {
+  const projectPath = state.getProjectPath();
+  const branch = modalEl.querySelector('#nw-branch').value.trim();
+  const baseInput = modalEl.querySelector('#nw-base');
+  if (!projectPath || !branch || baseInput.dataset.touched) return;
+  const res = await ipcRenderer.invoke(IPC.WORKSPACE_BASE_FOR_BRANCH, { projectPath, branch }).catch(() => null);
+  if (state.getProjectPath() !== projectPath || modalEl.querySelector('#nw-branch').value.trim() !== branch) return;
+  if (!baseInput.dataset.touched && res && res.base) baseInput.value = res.base;
+}
+
+function multiTerminalUI() {
+  return require('./terminal').getMultiTerminalUI();
+}
+
+function toolOptionsHtml() {
+  const aiToolSelector = require('./aiToolSelector');
+  const tools = aiToolSelector.getAvailableTools() || {};
+  const current = aiToolSelector.getCurrentTool();
+  const ids = Object.keys(tools);
+  if (!ids.length) return '<option value="">No AI CLI configured</option>';
+  return ids.map((id) => {
+    const t = tools[id];
+    return `<option value="${escapeHtml(id)}"${current && current.id === id ? ' selected' : ''}>${escapeHtml(t.name || id)}</option>`;
+  }).join('');
+}
+
+function syncFrom() {
+  const from = modalEl.querySelector('input[name="nw-from"]:checked').value;
+  const baseRow = modalEl.querySelector('#nw-base-row');
+  const branchRow = modalEl.querySelector('#nw-branch-row');
+  baseRow.hidden = false;
+  branchRow.hidden = from !== 'branch';
+  paintFromHint();
+  // Focus the first field without opening its list on top of the form.
+  const first = from === 'new' ? modalEl.querySelector('#nw-base') : modalEl.querySelector('#nw-branch');
+  first.dataset.quiet = '1';
+  first.focus();
+  first.select();
+}
+
+async function open({ location = null, serverKey = null } = {}) {
+  if (!modalEl || busy) return;
+  const projectPath = state.getProjectPath();
+  if (!projectPath) {
+    notify.error('Open a project first');
+    return;
+  }
+  modalEl.querySelector('#nw-tool').innerHTML = toolOptionsHtml();
+  modalEl.querySelector('#nw-prompt').value = '';
+  modalEl.querySelector('#nw-branch').value = '';
+  delete modalEl.querySelector('#nw-base').dataset.touched;
+  modalEl.querySelector('input[name="nw-from"][value="new"]').checked = true;
+  modalEl.querySelector('#nw-error').textContent = '';
+  syncLocation(location, serverKey);
+  setBusy(false);
+  modalEl.classList.add('visible');
+  syncFrom();
+
+  const [def, branches] = await Promise.all([
+    ipcRenderer.invoke(IPC.GIT_DEFAULT_BRANCH, projectPath).catch(() => null),
+    ipcRenderer.invoke(IPC.LOAD_GIT_BRANCHES, projectPath, { workspaceId: 'main' }).catch(() => null)
+  ]);
+  if (state.getProjectPath() !== projectPath) return;
+  defaultBase = def && def.branch ? def.branch : null;
+  const all = (branches && branches.branches) || [];
+  branchNames = {
+    local: all.filter((b) => !b.isRemote).map((b) => b.name),
+    remote: all.filter((b) => b.isRemote && b.shortName).map((b) => b.shortName)
+  };
+  const baseInput = modalEl.querySelector('#nw-base');
+  if (!baseInput.value || baseInput.dataset.project !== projectPath) baseInput.value = defaultBase || '';
+  baseInput.dataset.project = projectPath;
+  paintFromHint();
+}
+
+// The last location used per project (multi-server-connections):
+// localStorage `frame-nw-location` = { [projectPath]: 'local' | serverKey }.
+const LOCATION_KEY = 'frame-nw-location';
+
+function lastLocation(projectPath) {
+  try { return (JSON.parse(localStorage.getItem(LOCATION_KEY) || '{}') || {})[projectPath] || null; } catch (_) { return null; }
+}
+
+function rememberLocation(projectPath, value) {
+  try {
+    const all = JSON.parse(localStorage.getItem(LOCATION_KEY) || '{}') || {};
+    all[projectPath] = value;
+    localStorage.setItem(LOCATION_KEY, JSON.stringify(all));
+  } catch (_) { /* a preference, not state */ }
+}
+
+/**
+ * Location (server-workspaces; multi-server-connections): "This Mac", or one
+ * of the saved servers. Shown once a server is saved; a server that is down
+ * is listed but disabled. From Remote's "+" the pick is a server (this
+ * project's last one, else the first connected); otherwise this project's
+ * last location, else This Mac.
+ */
+function syncLocation(preferred = null, serverKey = null) {
+  const row = modalEl.querySelector('#nw-location-row');
+  const sel = modalEl.querySelector('#nw-location');
+  const hint = modalEl.querySelector('#nw-location-hint');
+  const servers = require('./serverConnect').getServers();
+  row.hidden = !servers.length;
+  const opts = ['<option value="local">This Mac</option>'];
+  for (const srv of servers) {
+    const up = srv.status && srv.status.state === 'connected';
+    opts.push(`<option value="${escapeHtml(srv.key)}"${up ? '' : ' disabled'}>Server · ${escapeHtml(srv.host)}${up ? '' : ' (not connected)'}</option>`);
+  }
+  sel.innerHTML = opts.join('');
+  const usable = (v) => v === 'local' || servers.some((x) => x.key === v && x.status && x.status.state === 'connected');
+  const remembered = lastLocation(state.getProjectPath());
+  const firstUp = (servers.find((x) => x.status && x.status.state === 'connected') || {}).key || null;
+  let wanted;
+  if (preferred === 'server') {
+    // Opened from Remote's "+": a server — the given one, else the one this
+    // project used last, else the first connected.
+    wanted = [serverKey, remembered !== 'local' ? remembered : null, firstUp].find((v) => v && usable(v)) || null;
+  } else if (preferred === 'local') {
+    wanted = 'local';
+  } else {
+    wanted = remembered;
+  }
+  sel.value = wanted && usable(wanted) ? wanted : 'local';
+  const paint = () => {
+    const srv = servers.find((x) => x.key === sel.value);
+    hint.textContent = srv
+      ? `Cloned from the remote on ${srv.host}; terminals and agents run there and keep running while this Mac is away.`
+      : '';
+  };
+  sel.onchange = paint;
+  paint();
+}
+
+function close() {
+  if (!modalEl || busy) return;
+  modalEl.classList.remove('visible');
+}
+
+function setBusy(on) {
+  busy = on;
+  modalEl.querySelector('#nw-create').disabled = on;
+  modalEl.querySelector('#nw-create').textContent = on ? 'Creating…' : 'Create';
+}
+
+async function submit() {
+  if (busy) return;
+  const projectPath = state.getProjectPath();
+  const from = modalEl.querySelector('input[name="nw-from"]:checked').value;
+  const base = modalEl.querySelector('#nw-base').value.trim();
+  const branch = modalEl.querySelector('#nw-branch').value.trim();
+  const toolId = modalEl.querySelector('#nw-tool').value || null;
+  const prompt = modalEl.querySelector('#nw-prompt').value.trim();
+  const errorEl = modalEl.querySelector('#nw-error');
+  errorEl.textContent = '';
+  if (from === 'branch' && !branch) {
+    errorEl.textContent = 'Choose the branch to open.';
+    return;
+  }
+
+  const where = modalEl.querySelector('#nw-location').value || 'local';
+  setBusy(true);
+  let result;
+  try {
+    result = await ipcRenderer.invoke(IPC.WORKSPACE_CREATE, {
+      projectPath,
+      location: where === 'local' ? 'local' : 'server',
+      serverKey: where === 'local' ? null : where,
+      from,
+      base: base || undefined,
+      branch: from === 'branch' ? branch : undefined
+    });
+  } catch (err) {
+    result = { error: err.message };
+  }
+  setBusy(false);
+  if (!result || result.error) {
+    errorEl.textContent = (result && result.error) || 'Could not create the workspace.';
+    return;
+  }
+
+  modalEl.classList.remove('visible');
+  rememberLocation(projectPath, where);
+  if (result.fetch && !result.fetch.skipped && !result.fetch.fetched) {
+    notify.info(`Couldn't fetch origin/${result.workspace.base} — started from the local copy.`);
+  }
+  if (result.sent) {
+    // The project went to the server as a git bundle (server-onboarding):
+    // committed history only — say what stayed here.
+    const n = Number(result.sent.uncommitted) || 0;
+    const host = (result.workspace && result.workspace.host) || 'the server';
+    notify.info(`Sent this project's committed history to ${host}.${n ? ` ${n} uncommitted change${n === 1 ? '' : 's'} stayed on this Mac — commit and push them to use them there.` : ''}`);
+  }
+
+  const section = require('./workspaceSection');
+  await section.load();
+  // The user may have switched project while the create ran (R6): the new
+  // workspace is listed there; nothing is selected or started here.
+  if (state.getProjectPath() !== projectPath) {
+    notify.info(`Workspace "${result.workspace.name}" was created in ${projectPath.split('/').pop()}.`);
+    return;
+  }
+  section.select(result.workspace);
+  // A server workspace has only what git carries: offer the files git leaves
+  // out (.env, local config) before setup runs, since setup often needs them
+  // (server-copy-files). Nothing is sent unless ticked.
+  if (result.location === 'server') {
+    const sendFiles = require('./sendFilesModal');
+    const picked = await sendFiles.open({ projectPath, workspace: result.workspace, context: 'create' });
+    if (picked && picked.sent) notify.info(sendFiles.summary(picked.sent));
+  }
+  runSetupThenAgent({ setupScript: result.setupScript, toolId, prompt });
+}
+
+/** Resolve when `terminalId` has run something and come back to its shell prompt. */
+function waitForSetupToFinish(terminalId) {
+  return new Promise((resolve) => {
+    let sawRunning = false;
+    let done = false;
+    let unsubscribe = null;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      if (unsubscribe) unsubscribe();
+      resolve();
+    };
+    const check = () => {
+      const s = laneStatus.getStatus(terminalId);
+      if (!multiTerminalUI().getManager().getTerminal(terminalId)) return finish(); // closed
+      if (s.status === 'running' || s.agentName) sawRunning = true;
+      else if (sawRunning && s.status === 'idle') finish();
+    };
+    unsubscribe = laneStatus.onChange((id) => { if (id === terminalId && !done) check(); });
+    // A script so quick it never registers as running still lets the agent start.
+    setTimeout(() => { if (!sawRunning) finish(); }, SETUP_START_GRACE_MS);
+  });
+}
+
+/**
+ * In the selected workspace: run the setup script (if any) in a "setup"
+ * terminal, then open the AI terminal with `toolId` and, when given, `prompt`.
+ */
+async function runSetupThenAgent({ setupScript, toolId = null, prompt = '', openAgent: withAgent = true } = {}) {
+  const ui = multiTerminalUI();
+  if (!ui) return;
+  const manager = ui.getManager();
+  const script = (setupScript || '').trim();
+  // Everything here belongs to the workspace selected now — the new (or
+  // restored) one — even if the user selects another while the setup script
+  // runs (R3). Its terminals are created for it explicitly, and the view only
+  // follows them while it is still selected.
+  const guard = scopeGuard(state.currentScope(), state.currentScope);
+  const target = { projectPath: guard.projectPath, workspaceId: guard.workspaceId, cwd: state.getWorkspaceRoot() };
+
+  if (script) {
+    let setupId = null;
+    try {
+      setupId = await manager.createTerminal({ ...target });
+      if (setupId) manager.renameTerminal(setupId, SETUP_TERMINAL_NAME);
+    } catch (err) {
+      console.error('newWorkspaceModal: setup terminal failed', err);
+    }
+    if (setupId) {
+      if (guard.still()) ui.enterLane(setupId);
+      await new Promise((r) => setTimeout(r, SETTLE_MS));
+      if (guard.still()) ui.sendCommand(script, setupId);
+      else manager.sendCommand(script, setupId);
+      await waitForSetupToFinish(setupId);
+    } else {
+      notify.error('Could not open a terminal for the setup script.');
+    }
+  }
+  if (!withAgent) return;
+  if (!guard.sameProject()) return; // another project now: the agent is not started anywhere
+  await openAgent({ toolId, prompt, target, enter: guard.still() });
+}
+
+async function openAgent({ toolId, prompt, target, enter = true }) {
+  const ui = multiTerminalUI();
+  const aiToolSelector = require('./aiToolSelector');
+  const tools = aiToolSelector.getAvailableTools() || {};
+  const tool = (toolId && tools[toolId]) || aiToolSelector.getCurrentTool();
+  if (!prompt && (!tool || !tool.command)) return;
+  let id = null;
+  try {
+    id = await ui.getManager().createTerminal({ ...target });
+  } catch (err) {
+    console.error('newWorkspaceModal: agent terminal failed', err);
+  }
+  if (!id) {
+    notify.error('Could not open a terminal for the agent — the workspace may be at its terminal limit.');
+    return;
+  }
+  if (prompt) {
+    await require('./agentDispatch').dispatch({ terminalId: id, toolId, prompt, enter });
+    return;
+  }
+  if (enter) ui.enterLane(id);
+  setTimeout(() => (enter ? ui.sendCommand(tool.command, id) : ui.getManager().sendCommand(tool.command, id)), SETTLE_MS);
+}
+
+module.exports = { init, open, close, runSetupThenAgent };
